@@ -1,0 +1,60 @@
+.sidebar {
+  width: 30%;
+  height: 100vh;
+  background-color: #6b8a7a;
+  text-align: center;
+}
+
+.sidebar .pfp-username img {
+  width: 150px;
+  margin-top: 50px;
+}
+
+.pfp-image {
+  border-radius: 100px;
+  border: 3px solid white;
+}
+
+.username-p {
+  font-size: 30px;
+  color: white;
+  font-weight: bold;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.search-input {
+  margin-top: 20px;
+  padding: 10px;
+  font-size: 20px;
+  border: none;
+  border-radius: 100px;
+  font-weight: bold;
+}
+
+.search-input:hover {
+  cursor: default;
+  background-color: #d9d9d9;
+}
+
+.to-chat {
+  text-align: start;
+  margin-top: 50px;
+  padding: 0px 20px;
+}
+
+.to-chat-p {
+  font-size: 30px;
+  color: white;
+  font-weight: bold;
+}
+
+.uhnaaf {
+  color: #d9d9d9;
+  font-size: 18px;
+  margin-top: 15px;
+}
+
+.groups-div {
+  margin-top: 30px;
+}

@@ -1,0 +1,63 @@
+.acc-form {
+  background-color: #254336;
+  height: 100vh;
+  text-align: center;
+}
+
+.acc-form h1 {
+  font-size: 80px;
+  color: white;
+  padding-top: 100px;
+}
+
+.acc-form div {
+  margin: 20px 0px;
+}
+
+.acc-form div input {
+  width: 40%;
+  padding: 10px 20px;
+  border-radius: 100px;
+  font-size: 20px;
+  font-weight: bold;
+  background-color: #b7b597;
+  border: 3px solid #dad3be;
+  color: white;
+  cursor: default;
+  margin-top: 15px;
+}
+
+.acc-form div input::placeholder {
+  color: white;
+}
+
+.acc-form div input:hover {
+  background-color: #dad3be;
+}
+
+.error {
+  color: white;
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+.to-other-page {
+  color: #b7b597;
+  cursor: pointer;
+}
+
+.to-other-page:hover {
+  text-decoration: underline;
+}
+
+.acc-form div button {
+  background-color: #b7b597;
+  border: 3px solid #dad3be;
+  color: white;
+  width: 200px;
+  height: 50px;
+  font-size: 23px;
+  font-weight: bold;
+  border-radius: 100px;
+  cursor: pointer;
+}
