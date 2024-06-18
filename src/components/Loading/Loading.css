@@ -1,0 +1,11 @@
+.loading-window {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #254336;
+}
+
+.loading-window img {
+  width: 150px;
+}

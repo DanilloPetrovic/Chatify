@@ -1,15 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Register.css";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { auth, db } from "../../firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, getDocs } from "firebase/firestore";
+import Loading from "../../components/Loading/Loading";
 
 const Register = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [usernames, setUsernames] = useState([]);
   const userCollection = collection(db, "users");
   const navigate = useNavigate();
+
+  const getUsers = async () => {
+    const data = await getDocs(userCollection);
+    const filteredData = data.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const usernames = filteredData.map((user) => user.username);
+
+    setUsernames(usernames);
+    setUsers(filteredData);
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  console.log(users, "users");
+  console.log(usernames, "usernames");
 
   const formik = useFormik({
     initialValues: {
@@ -22,16 +46,22 @@ const Register = () => {
       email: Yup.string().required("required").email("not valid email"),
       password: Yup.string()
         .required("required")
-        .min(6, "min password lenght is 6")
-        .max(20, "max password lenght is 20"),
+        .min(6, "min password length is 6")
+        .max(20, "max password length is 20"),
       username: Yup.string()
         .required("required")
-        .min(6, "min username lenght is 6")
-        .max(20, "max username lenght is 20"),
+        .min(6, "min username length is 6")
+        .max(20, "max username length is 20"),
     }),
 
     onSubmit: async (values) => {
+      setIsLoading(true);
       if (!auth.currentUser) {
+        if (usernames.includes(values.username)) {
+          alert("Username already exists! Please choose a different one.");
+          return;
+        }
+
         try {
           const userCredential = await createUserWithEmailAndPassword(
             auth,
@@ -60,10 +90,15 @@ const Register = () => {
           console.log(err);
         }
       } else {
-        alert("You already logged in!");
+        alert("You are already logged in!");
       }
+      setIsLoading(false);
     },
   });
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="acc-form">

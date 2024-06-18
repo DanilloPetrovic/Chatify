@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { auth, db } from "../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../components/Loading/Loading";
 
 const LogIn = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
@@ -22,6 +24,7 @@ const LogIn = () => {
     }),
 
     onSubmit: async () => {
+      setIsLoading(true);
       const token = localStorage.getItem("token");
       if (!token) {
         try {
@@ -38,8 +41,13 @@ const LogIn = () => {
       } else {
         alert("You already logged in!");
       }
+      setIsLoading(false);
     },
   });
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="acc-form">

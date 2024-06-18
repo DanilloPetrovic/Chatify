@@ -4,8 +4,11 @@ import { auth, db } from "../../firebase";
 import nopfp from "../../photos/nopfp.png";
 import { getDocs, collection } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { IoIosArrowBack } from "react-icons/io";
 
 const Sidebar = () => {
+  const { username } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState();
   const [userFirestore, setUserFirestore] = useState([]);
@@ -29,35 +32,44 @@ const Sidebar = () => {
     }
   };
 
-  console.log(userFirestore);
-
   useEffect(() => {
     setUser(auth.currentUser);
     getUserFirestore();
   }, []);
 
-  console.log(userFirestore);
-
   return (
     <div className="sidebar">
-      <div className="pfp-username">
-        {user && user.photoURL ? (
-          <img className="pfp-image" src={user.photoURL} />
-        ) : (
-          <img className="pfp-image" src={nopfp} />
-        )}
-
-        {user ? (
-          <p
+      {username ? (
+        <div className="back-to-home-div">
+          <button
+            className="back-to-home"
             onClick={() => {
-              navigate("/" + auth.currentUser.displayName);
+              navigate("/");
             }}
-            className="username-p"
           >
-            {user.displayName}
-          </p>
-        ) : null}
-      </div>
+            <IoIosArrowBack />
+          </button>
+        </div>
+      ) : (
+        <div className="pfp-username">
+          {user && user.photoURL ? (
+            <img className="pfp-image" src={user.photoURL} />
+          ) : (
+            <img className="pfp-image" src={nopfp} />
+          )}
+
+          {user ? (
+            <p
+              onClick={() => {
+                navigate("/" + auth.currentUser.displayName);
+              }}
+              className="username-p"
+            >
+              {user.displayName}
+            </p>
+          ) : null}
+        </div>
+      )}
 
       <div className="search-div">
         <input className="search-input" placeholder="Search..." />
