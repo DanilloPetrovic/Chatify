@@ -22,3 +22,68 @@
   color: white;
   margin-top: 10px;
 }
+
+.friends-groups-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 100px;
+}
+
+.friends-groups-container div {
+  color: white;
+}
+
+.friends-groups-container div h6 {
+  font-weight: bold;
+  font-size: 25px;
+  margin-top: 20px;
+}
+
+.friends-groups-container div p {
+  font-weight: 100;
+  margin-top: 10px;
+  font-size: 25px;
+}
+
+.profile-buttons {
+  margin-top: 20px;
+  width: 50%;
+}
+
+.profile-buttons button {
+  background-color: #b7b597;
+  border: 3px solid #dad3be;
+  color: white;
+  width: 200px;
+  height: 50px;
+  font-size: 23px;
+  font-weight: bold;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.edit-signout-btns {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.profile-info-div {
+  margin-top: 50px;
+  color: white;
+  width: 50%;
+}
+
+.friend-requests-p,
+.bio-p {
+  font-weight: bold;
+  font-size: 25px;
+  text-align: start;
+}
+
+.ydhafr {
+  color: #d9d9d9;
+  margin-top: 20px;
+  font-size: 20px;
+}

@@ -6,14 +6,28 @@ import { getDocs, collection } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
+import { onAuthStateChanged } from "firebase/auth";
+import Loading from "../Loading/Loading";
 
 const Sidebar = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const { username } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState();
   const [userFirestore, setUserFirestore] = useState([]);
 
-  const getUserFirestore = async () => {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        getUserFirestore(currentUser.displayName);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const getUserFirestore = async (displayName) => {
     const userCollection = collection(db, "users");
     const data = await getDocs(userCollection);
     const filteredData = data.docs.map((doc) => ({
@@ -21,21 +35,17 @@ const Sidebar = () => {
       id: doc.id,
     }));
 
-    if (auth.currentUser) {
-      const userFirestore = filteredData.filter(
-        (user) => user.username === auth.currentUser.displayName
-      );
+    const userFirestore = filteredData.filter(
+      (user) => user.username === displayName
+    );
 
-      setUserFirestore(userFirestore);
-    } else {
-      console.log("nema usera");
-    }
+    setUserFirestore(userFirestore);
+    setIsLoading(false);
   };
 
-  useEffect(() => {
-    setUser(auth.currentUser);
-    getUserFirestore();
-  }, []);
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="sidebar">

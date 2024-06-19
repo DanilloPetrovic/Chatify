@@ -32,8 +32,7 @@ const Register = () => {
     getUsers();
   }, []);
 
-  console.log(users, "users");
-  console.log(usernames, "usernames");
+  const handleFollow = async () => {};
 
   const formik = useFormik({
     initialValues: {
@@ -57,8 +56,16 @@ const Register = () => {
     onSubmit: async (values) => {
       setIsLoading(true);
       if (!auth.currentUser) {
-        if (usernames.includes(values.username)) {
-          alert("Username already exists! Please choose a different one.");
+        const invalidUsernames = ["register", "login"];
+
+        if (
+          usernames.includes(values.username) ||
+          invalidUsernames.includes(values.username.toLowerCase())
+        ) {
+          alert(
+            "Username already exists or is not allowed! Please choose a different one."
+          );
+          setIsLoading(false);
           return;
         }
 
@@ -81,6 +88,7 @@ const Register = () => {
             groups: [],
             bio: [],
             status: [],
+            imageURL: [],
           };
 
           await addDoc(userCollection, data);
