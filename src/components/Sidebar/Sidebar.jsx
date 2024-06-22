@@ -63,9 +63,21 @@ const Sidebar = () => {
       ) : (
         <div className="pfp-username">
           {user && user.photoURL ? (
-            <img className="pfp-image" src={user.photoURL} />
+            <img
+              onClick={() => {
+                navigate("/" + auth.currentUser.displayName);
+              }}
+              className="pfp-image"
+              src={user.photoURL}
+            />
           ) : (
-            <img className="pfp-image" src={nopfp} />
+            <img
+              onClick={() => {
+                navigate("/" + auth.currentUser.displayName);
+              }}
+              className="pfp-image"
+              src={nopfp}
+            />
           )}
 
           {user ? (

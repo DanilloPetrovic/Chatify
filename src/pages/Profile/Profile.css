@@ -87,3 +87,49 @@
   margin-top: 20px;
   font-size: 20px;
 }
+
+.follower-div {
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #b7b597;
+  margin-top: 10px;
+  border-radius: 20px;
+  border: 3px solid #dad3be;
+  cursor: pointer;
+}
+
+.follower-div div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.follower-div img {
+  width: 40px;
+  height: 40px;
+  border-radius: 100px;
+  border: 1px solid white;
+}
+
+.follower-div p {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.follower-div button {
+  background-color: #dad3be;
+  border: none;
+  color: white;
+  padding: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.follower-div button:hover {
+  background-color: transparent;
+}

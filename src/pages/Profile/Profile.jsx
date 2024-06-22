@@ -10,14 +10,15 @@ import Loading from "../../components/Loading/Loading";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
-  const [ownProfile, setOwnProfile] = useState();
+  const [ownProfile, setOwnProfile] = useState([]);
   const [userFirestore, setUserFirestore] = useState([]);
   const { username } = useParams();
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
+  const usersCollection = collection(db, "users");
 
-  const unsubscribeFn = () => {
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
@@ -26,28 +27,7 @@ const Profile = () => {
     });
 
     return () => unsubscribe();
-  };
-
-  const getOwnProfile = async () => {
-    if (auth.currentUser) {
-      const userCollection = collection(db, "users");
-      const data = await getDocs(userCollection);
-      const filteredData = data.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-
-      const ownProfile = filteredData.find(
-        (user) => user.username === auth.currentUser.displayName
-      );
-
-      if (ownProfile) {
-        setOwnProfile(ownProfile);
-      } else {
-        console.error("Own profile not found");
-      }
-    }
-  };
+  }, []);
 
   const getUserFirestore = async (displayName) => {
     const userCollection = collection(db, "users");
@@ -57,12 +37,24 @@ const Profile = () => {
       id: doc.id,
     }));
 
-    const userFirestore = filteredData.filter(
+    const userFirestoreVar = filteredData.filter(
       (user) => user.username === username
     );
 
-    setUserFirestore(userFirestore);
+    const ownProfileVar = filteredData.filter(
+      (user) => user.username === auth.currentUser.displayName
+    );
+
+    setOwnProfile(ownProfileVar);
+    setUserFirestore(userFirestoreVar);
+
     setIsLoading(false);
+  };
+
+  const isProfileInFriends = (profileId) => {
+    if (ownProfile.length > 0) {
+      return ownProfile[0].friends.some((friend) => friend.id === profileId);
+    }
   };
 
   const logout = async () => {
@@ -71,10 +63,153 @@ const Profile = () => {
     navigate("/");
   };
 
-  useEffect(() => {
-    unsubscribeFn();
-    getOwnProfile();
-  }, []);
+  const handleFollow = async () => {
+    if (ownProfile.length > 0 && userFirestore.length > 0) {
+      const ownProfileDocRef = doc(db, "users", ownProfile[0].id);
+      const userFirestoreDocRef = doc(db, "users", userFirestore[0].id);
+
+      const isFollowing = ownProfile[0].following.some(
+        (user) => user.id === userFirestore[0].id
+      );
+
+      if (isFollowing) {
+        alert("You are already following this profile!");
+        return;
+      }
+
+      const updatedFollowing = [...ownProfile[0].following, userFirestore[0]];
+      const updatedFollowers = [...userFirestore[0].followers, ownProfile[0]];
+      const updatedFriendsOwn = [...ownProfile[0].friends, userFirestore[0]];
+      const updatedFriendsOther = [...userFirestore[0].friends, ownProfile[0]];
+
+      try {
+        await updateDoc(ownProfileDocRef, {
+          following: updatedFollowing,
+          friends: updatedFriendsOwn,
+        });
+        await updateDoc(userFirestoreDocRef, {
+          followers: updatedFollowers,
+          friends: updatedFriendsOther,
+        });
+
+        setOwnProfile((prev) => [{ ...prev[0], following: updatedFollowing }]);
+        setUserFirestore((prev) => [
+          { ...prev[0], followers: updatedFollowers },
+        ]);
+
+        getUserFirestore(auth.currentUser.displayName);
+      } catch (error) {
+        console.error("Error following the user: ", error);
+      }
+    }
+  };
+
+  const handleUnfollow = async () => {
+    if (ownProfile.length > 0 && userFirestore.length > 0) {
+      const ownProfileDocRef = doc(usersCollection, ownProfile[0].id);
+      const userFirestoreDocRef = doc(usersCollection, userFirestore[0].id);
+
+      const updatedFollowing = ownProfile[0].following.filter(
+        (user) => user.id !== userFirestore[0].id
+      );
+      const updatedFollowers = userFirestore[0].followers.filter(
+        (user) => user.id !== ownProfile[0].id
+      );
+      const updatedFriendsOwn = ownProfile[0].friends.filter(
+        (friend) => friend.id !== userFirestore[0].id
+      );
+      const updatedFriendsOther = userFirestore[0].friends.filter(
+        (friend) => friend.id !== ownProfile[0].id
+      );
+
+      try {
+        await updateDoc(ownProfileDocRef, {
+          following: updatedFollowing,
+          friends: updatedFriendsOwn,
+        });
+        await updateDoc(userFirestoreDocRef, {
+          followers: updatedFollowers,
+          friends: updatedFriendsOther,
+        });
+
+        setOwnProfile((prev) => [{ ...prev[0], following: updatedFollowing }]);
+        setUserFirestore((prev) => [
+          { ...prev[0], followers: updatedFollowers },
+        ]);
+
+        getUserFirestore(auth.currentUser.displayName);
+      } catch (error) {
+        console.error("Error unfollowing the user: ", error);
+      }
+    }
+  };
+
+  const handleFollowBack = async (followerUsername) => {
+    const userCollection = collection(db, "users");
+    const data = await getDocs(userCollection);
+    const filteredData = data.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const userFirestoreToFollowBack = filteredData.filter(
+      (user) => user.username === followerUsername
+    );
+
+    const ownProfileDocRef = doc(userCollection, ownProfile[0].id);
+    const userFirestoreToFollowBackDocRef = doc(
+      userCollection,
+      userFirestoreToFollowBack[0].id
+    );
+
+    const isFollowing = ownProfile[0].following.some(
+      (user) => user.id === userFirestoreToFollowBack[0].id
+    );
+    const isFollower = userFirestoreToFollowBack[0].followers.some(
+      (user) => user.id === ownProfile[0].id
+    );
+
+    if (isFollowing) {
+      alert("You are already following this profile!");
+      return;
+    }
+
+    const updatedFollowing = [
+      ...ownProfile[0].following,
+      userFirestoreToFollowBack[0],
+    ];
+
+    const updatedFollowers = [
+      ...userFirestoreToFollowBack[0].followers,
+      ownProfile[0],
+    ];
+
+    const updatedFriendsOwn = [
+      ...ownProfile[0].friends,
+      userFirestoreToFollowBack[0],
+    ];
+    const updatedFreindsOther = [
+      ...userFirestoreToFollowBack[0].friends,
+      ownProfile[0],
+    ];
+
+    try {
+      await updateDoc(ownProfileDocRef, {
+        following: updatedFollowing,
+        friends: updatedFriendsOwn,
+      });
+      await updateDoc(userFirestoreToFollowBackDocRef, {
+        followers: updatedFollowers,
+        friends: updatedFreindsOther,
+      });
+
+      setOwnProfile((prev) => [{ ...prev[0], following: updatedFollowing }]);
+
+      getUserFirestore(auth.currentUser.displayName);
+    } catch (error) {
+      console.error("Error following the user: ", error);
+    }
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -100,7 +235,7 @@ const Profile = () => {
           ) : null}
         </div>
 
-        <div className="freidns-gropus">
+        <div className="friends-groups">
           {userFirestore.length > 0 ? (
             <div className="friends-groups-container">
               <div className="friends-div">
@@ -132,7 +267,16 @@ const Profile = () => {
               </div>
             </div>
           ) : (
-            <div className="follow-unfollow-btn"></div>
+            <div className="follow-unfollow-btn">
+              {ownProfile.length > 0 &&
+              ownProfile[0].following.some(
+                (user) => user.id === userFirestore[0].id
+              ) ? (
+                <button onClick={handleUnfollow}>Unfollow</button>
+              ) : (
+                <button onClick={handleFollow}>Follow</button>
+              )}
+            </div>
           )}
         </div>
 
@@ -142,14 +286,51 @@ const Profile = () => {
           userFirestore[0].username === auth.currentUser.displayName ? (
             <div className="profile-infos">
               <div className="friend-request-div">
-                <p className="friend-requests-p">
-                  Friend requests ({userFirestore[0].followers.length})
-                </p>
+                <p className="friend-requests-p">Friend requests</p>
 
                 {userFirestore[0].followers.length > 0 ? (
-                  userFirestore[0].followers.map((follower) => (
-                    <p>{follower.username}</p>
-                  ))
+                  userFirestore[0].followers.filter(
+                    (follower) => !isProfileInFriends(follower.id)
+                  ).length > 0 ? (
+                    userFirestore[0].followers
+                      .filter((follower) => !isProfileInFriends(follower.id))
+                      .map((follower) => (
+                        <div
+                          className="follower-div"
+                          key={follower.id}
+                          onClick={() => {
+                            navigate("/" + follower.username);
+                            window.location.reload();
+                          }}
+                        >
+                          <div>
+                            <img
+                              src={follower.imageURL || nopfp}
+                              alt="follower profile pic"
+                            />
+                            <p>{follower.username}</p>
+                          </div>
+                          <div>
+                            {isProfileInFriends(follower.id) ? (
+                              <button disabled>Followed</button>
+                            ) : (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleFollowBack(follower.username);
+                                }}
+                              >
+                                Follow Back
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                  ) : (
+                    <p className="ydhafr">
+                      You don't have any friend requests :(
+                    </p>
+                  )
                 ) : (
                   <p className="ydhafr">
                     You don't have any friend requests :(
