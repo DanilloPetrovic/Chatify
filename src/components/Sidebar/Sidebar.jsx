@@ -102,8 +102,31 @@ const Sidebar = () => {
           <p className="to-chat-p">Friends</p>
           {userFirestore.length > 0 && userFirestore[0].friends.length > 0 ? (
             userFirestore[0].friends.map((friend) => (
-              <div className="firend-div" key={friend.id}>
-                {friend.username}
+              <div
+                className="friend-div"
+                key={friend.id}
+                onClick={() => {
+                  navigate("/chat/" + friend.username);
+                }}
+              >
+                {friend.imageURL.length > 0 ? (
+                  <img
+                    src={friend.imageURL}
+                    onClick={() => {
+                      navigate("/" + friend.username);
+                      window.location.reload();
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={nopfp}
+                    onClick={() => {
+                      navigate("/" + friend.username);
+                      window.location.reload();
+                    }}
+                  />
+                )}
+                <p>{friend.username}</p>
               </div>
             ))
           ) : (

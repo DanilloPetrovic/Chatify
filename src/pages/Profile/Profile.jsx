@@ -77,10 +77,20 @@ const Profile = () => {
         return;
       }
 
+      const isFollowedByOtherUser = userFirestore[0].followers.some(
+        (user) => user.id === ownProfile[0].id
+      );
+
       const updatedFollowing = [...ownProfile[0].following, userFirestore[0]];
       const updatedFollowers = [...userFirestore[0].followers, ownProfile[0]];
-      const updatedFriendsOwn = [...ownProfile[0].friends, userFirestore[0]];
-      const updatedFriendsOther = [...userFirestore[0].friends, ownProfile[0]];
+
+      let updatedFriendsOwn = [...ownProfile[0].friends];
+      let updatedFriendsOther = [...userFirestore[0].friends];
+
+      if (isFollowedByOtherUser) {
+        updatedFriendsOwn = [...updatedFriendsOwn, userFirestore[0]];
+        updatedFriendsOther = [...updatedFriendsOther, ownProfile[0]];
+      }
 
       try {
         await updateDoc(ownProfileDocRef, {
@@ -224,10 +234,14 @@ const Profile = () => {
       <div className="main-div profile-div">
         <div className="img-username">
           {userFirestore.length > 0 ? (
-            <img
-              src={userFirestore[0].imageURL || nopfp}
-              className="pfp-profile"
-            />
+            userFirestore[0].imageURL.length > 0 ? (
+              <img
+                src={userFirestore[0].imageURL || nopfp}
+                className="pfp-profile"
+              />
+            ) : (
+              <img src={nopfp} className="pfp-profile" />
+            )
           ) : null}
 
           {userFirestore.length > 0 ? (

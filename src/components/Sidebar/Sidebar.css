@@ -12,6 +12,12 @@
 .pfp-image {
   border-radius: 100px;
   border: 3px solid white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.pfp-image:hover {
+  transform: scale(0.98);
 }
 
 .username-p {
@@ -72,4 +78,28 @@
   margin-top: 50px;
   text-align: start;
   margin-left: 20px;
+}
+
+.friend-div {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  background-color: #b7b597;
+  margin-top: 10px;
+  border-radius: 20px;
+  border: 3px solid #dad3be;
+  cursor: pointer;
+  gap: 10px;
+}
+
+.friend-div img {
+  width: 40px;
+  border-radius: 100px;
+  border: 1px solid #dad3da;
+}
+
+.friend-div p {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
 }
