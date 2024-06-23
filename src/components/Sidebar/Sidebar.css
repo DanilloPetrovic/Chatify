@@ -1,5 +1,5 @@
 .sidebar {
-  height: 100vh;
+  min-height: 100vh;
   background-color: #6b8a7a;
   text-align: center;
 }
@@ -18,6 +18,7 @@
 
 .pfp-image:hover {
   transform: scale(0.98);
+  box-shadow: 0px 0px 10px;
 }
 
 .username-p {
@@ -28,12 +29,19 @@
   cursor: pointer;
 }
 
+.search-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
 .search-input {
   margin-top: 20px;
   padding: 10px;
   font-size: 20px;
   border: none;
-  border-radius: 100px;
+  border-radius: 10px;
   font-weight: bold;
 }
 
@@ -102,4 +110,18 @@
   color: white;
   font-size: 20px;
   font-weight: bold;
+}
+
+.search-result-div {
+  background-color: #b7b597;
+  border: 1px solid #dad3be;
+  padding: 10px;
+  font-size: 20px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  width: 70%;
+  color: white;
+  margin-top: 5px;
+  cursor: pointer;
 }

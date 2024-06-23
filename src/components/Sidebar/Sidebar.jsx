@@ -15,6 +15,9 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState();
   const [userFirestore, setUserFirestore] = useState([]);
+  const [usernames, setUsernames] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [searchResult, setSearchResult] = useState([]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -39,13 +42,37 @@ const Sidebar = () => {
       (user) => user.username === displayName
     );
 
+    const usernames = filteredData.map((user) => user.username);
+
+    setUsernames(usernames);
     setUserFirestore(userFirestore);
     setIsLoading(false);
   };
 
+  const handleSearch = () => {
+    if (searchValue.length > 0) {
+      const searchValueLower = searchValue.toLowerCase();
+      const usernamesResult = usernames.filter(
+        (username) =>
+          username.toLowerCase().includes(searchValueLower) &&
+          username !== auth.currentUser.displayName
+      );
+
+      setSearchResult(usernamesResult);
+    } else {
+      setSearchResult([]);
+    }
+  };
+
+  useEffect(() => {
+    handleSearch();
+  }, [searchValue]);
+
   if (isLoading) {
     return <Loading />;
   }
+
+  console.log(searchResult);
 
   return (
     <div className="sidebar">
@@ -94,7 +121,26 @@ const Sidebar = () => {
       )}
 
       <div className="search-div">
-        <input className="search-input" placeholder="Search..." />
+        <input
+          onChange={(event) => setSearchValue(event.target.value)}
+          className="search-input"
+          placeholder="Search..."
+          value={searchValue}
+        />
+        {searchResult.length > 0
+          ? searchResult.map((user, i) => (
+              <div
+                onClick={() => {
+                  navigate("/" + user);
+                  window.location.reload();
+                }}
+                className="search-result-div"
+                key={i}
+              >
+                <p className="search-result-p">{user}</p>
+              </div>
+            ))
+          : null}
       </div>
 
       <div className="to-chat">

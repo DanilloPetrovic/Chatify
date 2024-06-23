@@ -318,10 +318,15 @@ const Profile = () => {
                           }}
                         >
                           <div>
-                            <img
-                              src={follower.imageURL || nopfp}
-                              alt="follower profile pic"
-                            />
+                            {follower.imageURL.length > 0 ? (
+                              <img
+                                src={follower.imageURL || nopfp}
+                                alt="follower profile pic"
+                              />
+                            ) : (
+                              <img src={nopfp} />
+                            )}
+
                             <p>{follower.username}</p>
                           </div>
                           <div>

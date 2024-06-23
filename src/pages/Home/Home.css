@@ -9,5 +9,5 @@
 .main-div {
   width: 70%;
   background-color: #254336;
-  height: 100vh;
+  min-height: 100vh;
 }
