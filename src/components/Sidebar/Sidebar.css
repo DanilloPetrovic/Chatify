@@ -1,8 +1,9 @@
 .sidebar {
   min-height: 100vh;
-  background-color: #6b8a7a;
+  background-image: linear-gradient(to bottom, #6b8a7a, #5b7668);
   text-align: center;
 }
+/* 6b8a7a */
 
 .sidebar .pfp-username img {
   width: 150px;

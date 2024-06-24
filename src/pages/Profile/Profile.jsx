@@ -271,7 +271,14 @@ const Profile = () => {
           userFirestore[0].username === auth.currentUser.displayName ? (
             <div className="edit-signout-btns">
               <div className="edit-btn-div">
-                <button className="edit-btn">Edit Profile</button>
+                <button
+                  className="edit-btn"
+                  onClick={() =>
+                    navigate("/edit-profile/" + userFirestore[0].username)
+                  }
+                >
+                  Edit Profile
+                </button>
               </div>
 
               <div className="signout-btn-div">

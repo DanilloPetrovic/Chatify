@@ -72,8 +72,6 @@ const Sidebar = () => {
     return <Loading />;
   }
 
-  console.log(searchResult);
-
   return (
     <div className="sidebar">
       {username ? (

@@ -8,6 +8,8 @@
 
 .main-div {
   width: 70%;
-  background-color: #254336;
+  background-image: linear-gradient(to right, #254336, #1a3026);
   min-height: 100vh;
 }
+
+/* #254336 */
