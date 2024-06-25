@@ -82,6 +82,12 @@
   text-align: start;
 }
 
+.bio-text {
+  margin: 20px 0px;
+  font-size: 20px;
+  text-align: start;
+}
+
 .ydhafr {
   color: #d9d9d9;
   margin-top: 20px;

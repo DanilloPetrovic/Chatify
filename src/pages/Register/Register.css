@@ -2,12 +2,19 @@
   background-color: #254336;
   height: 100vh;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.acc-form div {
+  width: 100%;
 }
 
 .acc-form h1 {
   font-size: 80px;
   color: white;
-  padding-top: 100px;
 }
 
 .acc-form div {
@@ -24,7 +31,6 @@
   border: 3px solid #dad3be;
   color: white;
   cursor: default;
-  margin-top: 15px;
 }
 
 .acc-form div input::placeholder {

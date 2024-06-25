@@ -11,7 +11,7 @@
 }
 
 .pfp-image {
-  border-radius: 100px;
+  border-radius: 100%;
   border: 3px solid white;
   cursor: pointer;
   transition: 0.3s;
@@ -44,6 +44,7 @@
   border: none;
   border-radius: 10px;
   font-weight: bold;
+  width: 80%;
 }
 
 .search-input:hover {
@@ -111,6 +112,10 @@
   color: white;
   font-size: 20px;
   font-weight: bold;
+}
+
+.groups-div {
+  padding-bottom: 50px;
 }
 
 .search-result-div {

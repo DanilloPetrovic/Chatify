@@ -32,8 +32,6 @@ const Register = () => {
     getUsers();
   }, []);
 
-  const handleFollow = async () => {};
-
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -86,7 +84,7 @@ const Register = () => {
             following: [],
             followers: [],
             groups: [],
-            bio: [],
+            bio: "",
             status: [],
             imageURL: [],
           };

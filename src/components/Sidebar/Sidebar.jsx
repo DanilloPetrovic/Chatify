@@ -18,6 +18,7 @@ const Sidebar = () => {
   const [usernames, setUsernames] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [searchResult, setSearchResult] = useState([]);
+  const [friends, setFriends] = useState([]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -44,6 +45,11 @@ const Sidebar = () => {
 
     const usernames = filteredData.map((user) => user.username);
 
+    const friendsRef = filteredData.filter((user) =>
+      userFirestore[0].friends.includes(user.id)
+    );
+
+    setFriends(friendsRef);
     setUsernames(usernames);
     setUserFirestore(userFirestore);
     setIsLoading(false);
@@ -144,8 +150,8 @@ const Sidebar = () => {
       <div className="to-chat">
         <div className="freinds-div">
           <p className="to-chat-p">Friends</p>
-          {userFirestore.length > 0 && userFirestore[0].friends.length > 0 ? (
-            userFirestore[0].friends.map((friend) => (
+          {friends.length > 0 ? (
+            friends.map((friend) => (
               <div
                 className="friend-div"
                 key={friend.id}

@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./EditProfile.css";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, updateProfile } from "firebase/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth, db, storage } from "../../firebase";
-import {
-  getDocs,
-  collection,
-  updateDoc,
-  doc,
-  addDoc,
-} from "firebase/firestore";
+import { getDocs, collection, updateDoc, doc } from "firebase/firestore";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import nopfp from "../../photos/nopfp.png";
@@ -24,24 +18,9 @@ const EditProfile = () => {
   const { username } = useParams();
   const [user, setUser] = useState(null);
   const [userFirestore, setUserFirestore] = useState([]);
-  const token = localStorage.getItem("token");
+  const [usernames, setUsernames] = useState([]);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const importImg = () => {
-      if (imageInput && imageInput[0]) {
-        const storageRef = ref(storage, `${token + imageInput[0].name}`);
-        uploadBytes(storageRef, imageInput[0]).then((snapshot) => {
-          getDownloadURL(snapshot.ref).then((url) => {
-            setImageUrls((prev) => [...prev, url]);
-          });
-        });
-      }
-    };
-
-    importImg();
-  }, [imageInput]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -66,6 +45,9 @@ const EditProfile = () => {
       (user) => user.username === username
     );
 
+    const usernamesArr = filteredData.map((user) => user.username);
+
+    setUsernames(usernamesArr);
     setUserFirestore(userFirestoreVar);
 
     setIsLoading(false);
@@ -74,30 +56,58 @@ const EditProfile = () => {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      image: "" || imageUrls,
-      username: "",
-      bio: "",
+      image: imageUrls[0] || userFirestore[0]?.imageURL || "",
+      username: userFirestore[0]?.username || "",
+      bio: userFirestore[0]?.bio || "",
     },
 
     validationSchema: Yup.object().shape({
       username: Yup.string()
         .min(6, "min username length is 6")
         .max(20, "max username length is 20"),
-      bio: Yup.string().max(200, "max description lenght is 200"),
+      bio: Yup.string().max(200, "max description length is 200"),
     }),
 
     onSubmit: async (values) => {
-      const collectionRef = collection(db, "projects");
-      const data = {
-        imageURL: imageUrls[0],
-        title: values.title,
-        description: values.description,
-        link: values.link,
-      };
-      await addDoc(collectionRef, data);
-      alert("Finish");
+      setIsLoading(true);
+
+      try {
+        let imageURL = userFirestore[0]?.imageURL || "";
+
+        if (imageInput) {
+          const imageRef = ref(storage, `profile_pictures/${user.uid}`);
+          await uploadBytes(imageRef, imageInput[0]);
+          imageURL = await getDownloadURL(imageRef);
+        }
+
+        await updateProfile(auth.currentUser, {
+          displayName: values.username,
+          photoURL: imageURL,
+        });
+
+        const userDoc = doc(db, "users", userFirestore[0].id);
+        await updateDoc(userDoc, {
+          username: values.username,
+          bio: values.bio,
+          imageURL: imageURL,
+        });
+
+        setUserFirestore((prev) => [
+          { ...prev[0], username: values.username, bio: values.bio, imageURL },
+        ]);
+
+        navigate(`/${values.username}`);
+      } catch (err) {
+        console.log(err);
+      }
+
+      setIsLoading(false);
     },
   });
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="edit-profile">
@@ -107,16 +117,24 @@ const EditProfile = () => {
 
       <div className="edit-profile-from main-div">
         <div className="pfp-form">
+          <div>
+            {imageUrls.length > 0 && imageUrls[0] ? (
+              <img className="pfp-edit-profile" src={imageUrls[0]} />
+            ) : (
+              <img className="pfp-edit-profile" src={nopfp} />
+            )}
+          </div>
+
           <input
-            type="file"
-            className="inputFile"
-            accept="image/png, image/jpeg"
-            id="fileInput"
+            name="image"
             onChange={(e) => setImageInput(e.target.files)}
+            onBlur={formik.handleBlur}
+            type="file"
+            title="Add Image"
           />
-          <label className="fileLabel" htmlFor="fileInput">
-            Add new Image
-          </label>
+          {formik.errors.image && formik.touched.image ? (
+            <p className="error">{formik.errors.image}</p>
+          ) : null}
         </div>
 
         {userFirestore.length > 0 && (
@@ -148,6 +166,10 @@ const EditProfile = () => {
                 <p className="error">{formik.errors.bio}</p>
               ) : null}
             </div>
+
+            <button className="save-button" onClick={formik.handleSubmit}>
+              Save
+            </button>
           </>
         )}
       </div>
