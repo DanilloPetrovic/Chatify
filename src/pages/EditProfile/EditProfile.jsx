@@ -167,7 +167,10 @@ const EditProfile = () => {
             {imageUrls.length > 0 && imageUrls[0] ? (
               <img className="pfp-edit-profile" src={formik.values.image} />
             ) : (
-              <img className="pfp-edit-profile" src={nopfp} />
+              <img
+                className="pfp-edit-profile"
+                src={userFirestore.imageURL || nopfp}
+              />
             )}
           </div>
 
