@@ -86,7 +86,7 @@ const Register = () => {
             groups: [],
             bio: "",
             status: [],
-            imageURL: [],
+            imageURL: "",
           };
 
           await addDoc(userCollection, data);

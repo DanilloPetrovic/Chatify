@@ -19,6 +19,7 @@ const EditProfile = () => {
   const [user, setUser] = useState(null);
   const [userFirestore, setUserFirestore] = useState([]);
   const [usernames, setUsernames] = useState([]);
+  const token = localStorage.getItem("token");
 
   const navigate = useNavigate();
 
@@ -33,6 +34,42 @@ const EditProfile = () => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const importImg = async () => {
+      if (imageInput && imageInput[0]) {
+        const file = imageInput[0];
+        const maxSize = 5 * 1024 * 1024; // 5 MB
+        const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+
+        // Provera veličine datoteke
+        if (file.size > maxSize) {
+          alert("File size exceeds 5 MB");
+          return;
+        }
+
+        // Provera tipa datoteke
+        if (!allowedTypes.includes(file.type)) {
+          alert("Invalid file type. Only JPEG, PNG and GIF are allowed.");
+          return;
+        }
+
+        const storageRef = ref(storage, `${token + file.name}`);
+        try {
+          const snapshot = await uploadBytes(storageRef, file);
+          const url = await getDownloadURL(snapshot.ref);
+          setImageUrls((prev) => [url, ...prev]);
+          console.log("Image uploaded successfully:", url);
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          alert("Error uploading image: " + error.message);
+        }
+      }
+    };
+
+    importImg();
+  }, [imageInput, token]);
+
+  // funkcija za dobjianje potrebnih informacija od profila
   const getUserFirestore = async (displayName) => {
     const userCollection = collection(db, "users");
     const data = await getDocs(userCollection);
@@ -41,13 +78,16 @@ const EditProfile = () => {
       id: doc.id,
     }));
 
-    const userFirestoreVar = filteredData.filter(
+    const userFirestoreVar = filteredData.find(
       (user) => user.username === username
     );
 
-    const usernamesArr = filteredData.map((user) => user.username);
+    const usernamesArr = filteredData
+      .map((user) => user.username)
+      .filter((username) => username !== userFirestoreVar.username);
 
     setUsernames(usernamesArr);
+
     setUserFirestore(userFirestoreVar);
 
     setIsLoading(false);
@@ -56,9 +96,9 @@ const EditProfile = () => {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      image: imageUrls[0] || userFirestore[0]?.imageURL || "",
-      username: userFirestore[0]?.username || "",
-      bio: userFirestore[0]?.bio || "",
+      image: imageUrls[0] || "",
+      username: userFirestore?.username || "",
+      bio: userFirestore?.bio || "",
     },
 
     validationSchema: Yup.object().shape({
@@ -71,39 +111,45 @@ const EditProfile = () => {
     onSubmit: async (values) => {
       setIsLoading(true);
 
-      try {
-        let imageURL = userFirestore[0]?.imageURL || "";
+      if (userFirestore && auth.currentUser) {
+        const userDoc = doc(db, "users", userFirestore.id);
+        const invalidUsernames = ["register", "login"];
 
-        if (imageInput) {
-          const imageRef = ref(storage, `profile_pictures/${user.uid}`);
-          await uploadBytes(imageRef, imageInput[0]);
-          imageURL = await getDownloadURL(imageRef);
+        if (
+          usernames.includes(values.username) ||
+          invalidUsernames.includes(values.username.toLowerCase())
+        ) {
+          alert(
+            "Username already exists or is not allowed! Please choose a different one."
+          );
+          setIsLoading(false);
+          return;
         }
 
-        await updateProfile(auth.currentUser, {
-          displayName: values.username,
-          photoURL: imageURL,
-        });
+        console.log(values.image);
 
-        const userDoc = doc(db, "users", userFirestore[0].id);
-        await updateDoc(userDoc, {
-          username: values.username,
-          bio: values.bio,
-          imageURL: imageURL,
-        });
-
-        setUserFirestore((prev) => [
-          { ...prev[0], username: values.username, bio: values.bio, imageURL },
-        ]);
-
-        navigate(`/${values.username}`);
-      } catch (err) {
-        console.log(err);
+        try {
+          await updateProfile(auth.currentUser, {
+            displayName: values.username,
+            photoURL: values.image || "",
+          });
+          await updateDoc(userDoc, {
+            username: values.username,
+            imageURL: values.image || "",
+            bio: values.bio,
+          });
+          navigate("/" + userFirestore.username);
+          window.location.reload();
+        } catch (err) {
+          console.log(err);
+        }
       }
-
       setIsLoading(false);
     },
   });
+
+  console.log(imageUrls[0], "ulrs");
+  console.log(imageInput, "input");
 
   if (isLoading) {
     return <Loading />;
@@ -119,7 +165,7 @@ const EditProfile = () => {
         <div className="pfp-form">
           <div>
             {imageUrls.length > 0 && imageUrls[0] ? (
-              <img className="pfp-edit-profile" src={imageUrls[0]} />
+              <img className="pfp-edit-profile" src={formik.values.image} />
             ) : (
               <img className="pfp-edit-profile" src={nopfp} />
             )}
@@ -129,15 +175,15 @@ const EditProfile = () => {
             name="image"
             onChange={(e) => setImageInput(e.target.files)}
             onBlur={formik.handleBlur}
+            for={"fileInput"}
             type="file"
-            title="Add Image"
           />
           {formik.errors.image && formik.touched.image ? (
             <p className="error">{formik.errors.image}</p>
           ) : null}
         </div>
 
-        {userFirestore.length > 0 && (
+        {userFirestore && (
           <>
             <div className="username-form">
               <input

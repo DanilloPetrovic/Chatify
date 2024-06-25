@@ -102,9 +102,11 @@ const ProfileInfo = () => {
 
     try {
       await updateDoc(ownProfileDocRef, {
+        following: [...ownProfile.following, userFirestoreToFollowBack.id],
         friends: updatedFriendsOwn,
       });
       await updateDoc(userFirestoreToFollowBackDocRef, {
+        followers: [...userFirestoreToFollowBack.followers, ownProfile.id],
         friends: updatedFriendsOther,
       });
 
