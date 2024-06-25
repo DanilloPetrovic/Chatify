@@ -124,6 +124,20 @@ const ProfileInfo = () => {
       {auth.currentUser && userFirestore ? (
         userFirestore.username === auth.currentUser.displayName ? (
           <div className="profile-infos">
+            <div className="bio-div-12">
+              {userFirestore.bio ? (
+                <div className="bio-div-2">
+                  <p className="bio-p">Biography</p>
+                  <p className="bio-text">{userFirestore.bio}</p>
+                </div>
+              ) : (
+                <div className="bio-div-2">
+                  <p className="bio-p">Biography</p>
+                  <p className="ydhafr">This user doesn't have a bio yet</p>
+                </div>
+              )}
+            </div>
+
             <div className="friend-request-div">
               <p className="friend-requests-p">Friend requests</p>
 

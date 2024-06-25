@@ -96,7 +96,7 @@ const EditProfile = () => {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      image: imageUrls[0] || "",
+      image: userFirestore?.imageURL || "",
       username: userFirestore?.username || "",
       bio: userFirestore?.bio || "",
     },
@@ -126,16 +126,16 @@ const EditProfile = () => {
           return;
         }
 
-        console.log(values.image);
+        const updatedImageURL = imageUrls[0] || userFirestore.imageURL || "";
 
         try {
           await updateProfile(auth.currentUser, {
             displayName: values.username,
-            photoURL: values.image || "",
+            photoURL: updatedImageURL,
           });
           await updateDoc(userDoc, {
             username: values.username,
-            imageURL: values.image || "",
+            imageURL: updatedImageURL,
             bio: values.bio,
           });
           navigate("/" + userFirestore.username);

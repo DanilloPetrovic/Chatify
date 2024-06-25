@@ -11,3 +11,16 @@
   background-image: linear-gradient(to right, #254336, #1e382c);
   min-height: 100vh;
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #dad3ba;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e382c;
+}

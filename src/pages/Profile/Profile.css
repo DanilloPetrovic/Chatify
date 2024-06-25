@@ -8,9 +8,11 @@
   align-items: center;
   flex-direction: column;
   text-align: center;
+  padding: 50px 0px;
 }
 
 .pfp-profile {
+  height: 200px;
   width: 200px;
   border-radius: 100px;
   border: 3px solid white;
@@ -82,15 +84,23 @@
   text-align: start;
 }
 
+.friend-request-div {
+  margin-top: 50px;
+}
+
 .bio-text {
   margin: 20px 0px;
-  font-size: 20px;
+  padding: 20px;
+  font-size: 19px;
   text-align: start;
+  color: #d9d9d9;
+  border-top: 1px solid #1e382c;
+  border-bottom: 1px solid #1e382c;
 }
 
 .ydhafr {
   color: #d9d9d9;
-  margin-top: 20px;
+  margin: 20px 0px;
   font-size: 20px;
 }
 
