@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { auth, db } from "../../firebase";
-import { getDocs, collection, doc, updateDoc } from "firebase/firestore";
+import { getDocs, collection, doc, updateDoc, serverTimestamp, addDoc } from "firebase/firestore";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -10,6 +10,7 @@ const ButtonsProfile = () => {
   const [userFirestore, setUserFirestore] = useState(); // podaci profila koji se prikazuje na stranici iz firestore
   const { username } = useParams(); // varijabla koja cuva username iz url linka da bismo prepoznali profil
   const [isLoading, setIsLoading] = useState(true); // varijabla koja pokrece loading window
+  const [chats, setChats] = useState([])
 
   const navigate = useNavigate(); // varijabla za navigaciju
 
@@ -47,6 +48,26 @@ const ButtonsProfile = () => {
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    getChats()
+  }, [userFirestore, ownProfile])
+
+  // Funkcija za dobijanje chat kolekcije
+  const getChats = async () => {
+    if(userFirestore && ownProfile){
+    const chatsCollection = collection(db, "chats")
+    const data = await getDocs(chatsCollection);
+    const filteredData = data.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const chatsRef = filteredData.filter(chat => chat.users.includes(userFirestore.id) && chat.users.includes(ownProfile.id))
+
+    setChats(chatsRef)
+  }
+  }
+
   //   button funkcije
 
   const logout = async () => {
@@ -57,6 +78,9 @@ const ButtonsProfile = () => {
 
   const handleFollow = async () => {
     if (ownProfile && userFirestore) {
+      // Uzimanje chat kolekcije
+      const chatsCollection = collection(db, "chats")
+
       // Uzimanje document-a iz firebase za profile
       const ownProfileDocRef = doc(db, "users", ownProfile.id);
       const userFirestoreDocRef = doc(db, "users", userFirestore.id);
@@ -73,7 +97,7 @@ const ButtonsProfile = () => {
       }
 
       //   provera da li prikazani profil prati prijavljeni profil
-      const isFollowedByOtherUser = userFirestore.followers.some(
+      const isFollowedByOtherUser = userFirestore.following.some(
         (user) => user === ownProfile.id
       );
 
@@ -98,9 +122,17 @@ const ButtonsProfile = () => {
         updatedFriendsOther = [...updatedFriendsOther, ownProfile.id];
       }
 
+      // kreiranje chat konstruktora
+      const chatRef = {
+        users: [userFirestore.id, ownProfile.id],
+        messages: [],
+        createdAt: serverTimestamp(),
+        chatType: "normal",
+      }
+
       //   update-ovanje firebase profila i lokalna memorija
       try {
-        await updateDoc(ownProfileDocRef, {
+          await updateDoc(ownProfileDocRef, {
           following: updatedFollowingOwnProfile,
           friends: updatedFriendsOwn,
         });
@@ -119,6 +151,23 @@ const ButtonsProfile = () => {
           followers: updatedFollowersUserFirestore,
           friends: updatedFriendsOther,
         }));
+          
+        if(chats.length !== 0){
+          return
+        } else{
+        // ako ne postoji chat sa ova dva usera
+          const chatDoc = await addDoc(chatsCollection, chatRef);
+
+          // dodavanje u chat nizove
+          const ownProfileAddChatId = [...ownProfile.chats, chatDoc.id]
+          const userFirestoreAddChatId = [...userFirestore.chats, chatDoc.id]
+
+          await updateDoc(ownProfileDocRef, {chats: ownProfileAddChatId})
+          await updateDoc(userFirestoreDocRef, {chats: userFirestoreAddChatId})
+
+          setOwnProfile(prev => ({...prev, chats: ownProfileAddChatId}))
+          setUserFirestore(prev => ({...prev, chats: userFirestoreAddChatId}))
+        }
       } catch (error) {
         console.error("Error following the user: ", error);
       }

@@ -80,13 +80,14 @@ const Register = () => {
             username: values.username,
             email: values.email,
             password: values.password,
-            friends: [],
+            imageURL: "",
+            bio: "",
             following: [],
             followers: [],
+            friends: [],
+            chats: [],
             groups: [],
-            bio: "",
             status: [],
-            imageURL: "",
           };
 
           await addDoc(userCollection, data);

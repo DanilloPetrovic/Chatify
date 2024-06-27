@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth, db } from "../../firebase";
-import { getDocs, collection, doc, updateDoc } from "firebase/firestore";
+import { getDocs, collection, doc, updateDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import nopfp from "../../photos/nopfp.png";
 
@@ -12,6 +12,7 @@ const ProfileInfo = () => {
   const [followers, setFollowers] = useState([]);
   const { username } = useParams();
   const [isLoading, setIsLoading] = useState(true);
+  const [chats, setChats] = useState([])
 
   const navigate = useNavigate();
   const usersCollection = collection(db, "users");
@@ -54,6 +55,24 @@ const ProfileInfo = () => {
     setIsLoading(false);
   };
 
+  // funkcija za chat dokumente
+    const getChats = async () => {
+    if(userFirestore && ownProfile){
+    const chatsCollection = collection(db, "chats")
+    const data = await getDocs(chatsCollection);
+    const filteredData = data.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const chatsRef = filteredData.filter(chat => chat.users.includes(userFirestore.id) && chat.users.includes(ownProfile.id))
+
+    setChats(chatsRef)
+  }
+  }
+
+  useEffect(() => {getChats();}, [userFirestore, ownProfile])
+
   // Function to check if a profile is already a friend
   const isProfileInFriends = (profileId) => {
     return ownProfile?.friends.some((friend) => friend === profileId);
@@ -74,6 +93,8 @@ const ProfileInfo = () => {
 
     if (!userFirestoreToFollowBack) return;
 
+    // uzimanje chats kolekcije iz firebase
+    const chatsCollection = collection(db, 'chats')
     const ownProfileDocRef = doc(userCollection, ownProfile.id);
     const userFirestoreToFollowBackDocRef = doc(
       userCollection,
@@ -100,6 +121,14 @@ const ProfileInfo = () => {
       ownProfile.id,
     ];
 
+    // kreiranje chat konstruktora
+      const chatRef = {
+        users: [userFirestoreToFollowBack.id, ownProfile.id],
+        messages: [],
+        createdAt: serverTimestamp(),
+        chatType: "normal",
+      }
+
     try {
       await updateDoc(ownProfileDocRef, {
         following: [...ownProfile.following, userFirestoreToFollowBack.id],
@@ -114,10 +143,30 @@ const ProfileInfo = () => {
         ...prev,
         friends: updatedFriendsOwn,
       }));
+
+      if(chats.length !== 0){
+        return
+      } else{
+        // ako ne postoji chat sa ova dva usera
+          let chatDoc = await addDoc(chatsCollection, chatRef);
+
+          // dodavanje u chat nizove
+          const ownProfileAddChatId = [...ownProfile.chats, chatDoc.id]
+          const userFirestoreAddChatId = [...userFirestoreToFollowBack.chats, chatDoc.id]
+
+          await updateDoc(ownProfileDocRef, {chats: ownProfileAddChatId})
+          await updateDoc(userFirestoreToFollowBackDocRef, {chats: userFirestoreAddChatId})
+
+          setOwnProfile(prev => ({...prev, chats: ownProfileAddChatId}))
+          setUserFirestore(prev => ({...prev, chats: userFirestoreAddChatId}))
+      }
+
     } catch (error) {
       console.error("Error following the user: ", error);
     }
   };
+
+  console.log(chats)
 
   return (
     <div className="profile-info-div">
