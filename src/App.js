@@ -5,6 +5,7 @@ import Register from "./pages/Register/Register";
 import LogIn from "./pages/LogIn/LogIn";
 import Profile from "./pages/Profile/Profile";
 import EditProfile from "./pages/EditProfile/EditProfile";
+import Chat from "./pages/Chat/Chat";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/login" element={<LogIn />} />
         <Route path="/:username" element={<Profile />} />
         <Route path="/edit-profile/:username" element={<EditProfile />} />
+        <Route path="/chat/:username" element={<Chat />} />
       </Routes>
     </BrowserRouter>
   );

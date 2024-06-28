@@ -157,6 +157,7 @@ const Sidebar = () => {
                 key={friend.id}
                 onClick={() => {
                   navigate("/chat/" + friend.username);
+                  window.location.reload();
                 }}
               >
                 {friend.imageURL.length > 0 ? (
