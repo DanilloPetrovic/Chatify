@@ -31,10 +31,6 @@ const Chat = () => {
   const endRef = useRef(null);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
-  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
@@ -87,6 +83,10 @@ const Chat = () => {
     }
   }, [ownProfile, userFirestore]);
 
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [currentChat]);
+
   const handleEmoji = (e) => {
     formik.setFieldValue("message", formik.values.message + e.emoji);
     setIsOpen(false);
@@ -118,7 +118,7 @@ const Chat = () => {
         ];
 
         await updateDoc(chatDocRef, { messages: updatedMessageArr });
-        formik.values.message = "";
+        formik.resetForm(); // Reset form to clear the message input field
       }
     },
   });
@@ -180,11 +180,11 @@ const Chat = () => {
                   </div>
                 )
               )}
+              <div ref={endRef}></div>
             </div>
           ) : null}
         </div>
 
-        <div ref={endRef}></div>
         <form className="inputs-header-div" onSubmit={formik.handleSubmit}>
           <input
             name="message"
