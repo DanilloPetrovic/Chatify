@@ -193,6 +193,9 @@ const Chat = () => {
             value={formik.values.message}
             placeholder="Enter your message..."
           />
+          <button type="submit" className="chat-send-button">
+            Send
+          </button>
           <div className="emoji-div">
             <button
               className="emoji-picker-button"
@@ -209,9 +212,6 @@ const Chat = () => {
               </div>
             )}
           </div>
-          <button type="submit" className="chat-send-button">
-            Send
-          </button>
         </form>
       </div>
     </div>
