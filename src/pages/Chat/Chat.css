@@ -47,7 +47,7 @@
   position: absolute;
   bottom: 0;
   width: 100%;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   gap: 10px;
 }
 
@@ -103,12 +103,14 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  /* margin-bottom: 50px; */
 }
 
 .all-messages-div {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  font-size: 18px;
 }
 
 .my-message-div {
@@ -123,7 +125,6 @@
 
 .message-content {
   display: flex;
-  align-items: center;
   gap: 10px;
   max-width: 60%;
 }
@@ -132,7 +133,6 @@
   flex-direction: row-reverse;
   background-color: #dad3be;
   color: white;
-
   border-radius: 10px;
   padding: 10px;
 }
@@ -140,7 +140,6 @@
 .other-message-div .message-content {
   background-color: #b7b597;
   color: white;
-
   border-radius: 10px;
   padding: 10px;
 }
@@ -154,4 +153,13 @@
 
 .my-message-p {
   margin: 0;
+}
+
+.all-messages-div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 10px;
 }
