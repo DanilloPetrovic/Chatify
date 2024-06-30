@@ -208,3 +208,20 @@
   background-color: #a7a58a;
   border-radius: 10px;
 }
+
+.create-group-div{
+  background-color: #5b7668;
+  padding: 10px;
+  border-radius: 20px;
+  margin-top: 10px;
+}
+
+.create-group-input{
+  font-size: 15px;
+}
+
+.name-input{
+  border-radius: 10px;
+  padding: 10px;
+  border: none;
+}

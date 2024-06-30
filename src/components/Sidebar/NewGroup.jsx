@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  serverTimestamp,
+  updateDoc,
+  addDoc,
+} from "firebase/firestore";
 import { db, auth } from "../../firebase";
 import loadingImg from "../../photos/Rolling@1x-1.9s-200px-200px.gif";
 
@@ -13,6 +20,7 @@ const NewGroup = () => {
   const [searchValue, setSearchValue] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [friendsToAddInGroup, setFriendsToAddInGroup] = useState([]);
+  const [groupName, setGroupName] = useState("");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -43,9 +51,9 @@ const NewGroup = () => {
       userFirestore[0].friends.includes(user.id)
     );
 
-    setFriendsToAddInGroup((prev) => [...prev, userFirestore.id]);
     setFriends(friendsRef);
     setUserFirestore(userFirestore);
+    setFriendsToAddInGroup((prev) => [...prev, userFirestore[0].id]);
     setIsLoading(false);
   };
 
@@ -74,7 +82,50 @@ const NewGroup = () => {
     }
   };
 
-  console.log(friendsToAddInGroup);
+  const handleCreateGroup = async () => {
+    if (
+      friendsToAddInGroup.length >= 3 &&
+      groupName.length !== 0 &&
+      friendsToAddInGroup.length <= 5 &&
+      userFirestore
+    ) {
+      setIsLoading(true);
+
+      try {
+        const chatsRef = collection(db, "chats");
+        const ownProfileDocRef = doc(db, "users", userFirestore.id);
+
+        const groupConstructor = {
+          users: friendsToAddInGroup,
+          messages: [],
+          createdAt: serverTimestamp(),
+          chatType: "group",
+          groupName: groupName,
+        };
+
+        const groupDoc = await addDoc(chatsRef, groupConstructor);
+
+        const updatePromises = friends.map((friend) => {
+          if (friendsToAddInGroup.includes(friend.id)) {
+            const friendDocRef = doc(db, "users", friend.id);
+            return updateDoc(friendDocRef, {
+              groups: [...(friend.groups || []), groupDoc.id],
+            });
+          }
+          return Promise.resolve();
+        });
+
+        await Promise.all(updatePromises);
+      } catch (error) {
+        console.error("Error creating group: ", error);
+        alert("An error occurred while creating the group.");
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      alert("Group must have between 3 and 5 members :(");
+    }
+  };
 
   if (isLoading) {
     return <img style={{ width: "50px", height: "50px" }} src={loadingImg} />;
@@ -82,14 +133,22 @@ const NewGroup = () => {
 
   return (
     <div className="create-group-div">
+      <input
+        placeholder="Enter group name..."
+        className="name-input"
+        onChange={(e) => setGroupName(e.target.value)}
+        value={groupName}
+      />
       <div className="up-create-div">
         <input
           placeholder="Search friends..."
-          className="search-input"
+          className="search-input create-group-input"
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
         />
-        <button className="create-group-div">Create</button>
+        <button className="create-group-div" onClick={handleCreateGroup}>
+          Create
+        </button>
       </div>
 
       <div className="suggested-friends-div">
@@ -110,7 +169,6 @@ const NewGroup = () => {
             {friends.map((friend) => (
               <div className="suggested-friend">
                 <p>{friend.username}</p>
-                {friendsToAddInGroup.length}
                 <button
                   className="add-friend-to-group"
                   onClick={() => handleAddFriendInGroup(friend.id)}
