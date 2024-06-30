@@ -8,8 +8,10 @@ import { useParams } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 import { onAuthStateChanged } from "firebase/auth";
 import Loading from "../Loading/Loading";
+import NewGroup from "./NewGroup";
 
 const Sidebar = () => {
+  const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { username } = useParams();
   const navigate = useNavigate();
@@ -186,11 +188,19 @@ const Sidebar = () => {
         </div>
 
         <div className="groups-div">
-          <p className="to-chat-p">Groups</p>
+          <div className="groups-header">
+            <p className="to-chat-p">Groups</p>{" "}
+            <button onClick={() => setIsCreateGroupOpen((prev) => !prev)}>
+              {isCreateGroupOpen ? "-" : "+"}
+            </button>
+          </div>
+
+          {isCreateGroupOpen ? <NewGroup /> : null}
+
           {userFirestore.length > 0 && userFirestore[0].groups.length > 0 ? (
-            userFirestore[0].groups.map((friend) => (
-              <div className="firend-div" key={friend.id}>
-                {friend.username}
+            userFirestore[0].groups.map((group) => (
+              <div className="firend-div" key={group.id}>
+                {group.username}
               </div>
             ))
           ) : (

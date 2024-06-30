@@ -132,3 +132,94 @@
   margin-top: 5px;
   cursor: pointer;
 }
+
+.groups-header {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
+}
+
+.groups-header button {
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  background-color: #b7b597;
+  border: 2px solid #dad3be;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.groups-header button:hover {
+  background-color: #a7a58a;
+}
+
+.up-create-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.up-create-div button {
+  background-color: transparent;
+  padding: 10px;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+}
+
+.up-create-div button:hover {
+  background-color: #b7b597;
+  border-radius: 10px;
+}
+
+.suggested-friends-div {
+  margin-top: 10px;
+}
+
+.suggested-friends-div div div,
+.searched-friend {
+  display: flex;
+  padding: 10px;
+  background-color: #b7b597;
+  margin-top: 5px;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.suggested-friends-div div div button,
+.searched-friend button {
+  background-color: transparent;
+  padding: 10px;
+  font-size: 18px;
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.suggested-friends-div div div button:hover,
+.searched-friend button:hover {
+  background-color: #a7a58a;
+  border-radius: 10px;
+}
+
+.search-input-creating-group {
+  margin: 5px;
+  font-size: 15px;
+}
+
+.create-group-div {
+  background-color: #5b7668;
+  padding: 10px;
+  border-radius: 20px;
+  margin-top: 10px;
+}
