@@ -3,12 +3,13 @@ import "./Sidebar.css";
 import { auth, db } from "../../firebase";
 import nopfp from "../../photos/nopfp.png";
 import { getDocs, collection } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 import { onAuthStateChanged } from "firebase/auth";
 import Loading from "../Loading/Loading";
 import NewGroup from "./NewGroup";
+import grouppfp from "../../photos/Untitled design (5).png";
 
 const Sidebar = () => {
   const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
@@ -21,6 +22,8 @@ const Sidebar = () => {
   const [searchValue, setSearchValue] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [friends, setFriends] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const location = useLocation();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -54,8 +57,30 @@ const Sidebar = () => {
     setFriends(friendsRef);
     setUsernames(usernames);
     setUserFirestore(userFirestore);
+    setGroups(userFirestore[0].groups);
     setIsLoading(false);
   };
+
+  const getGroups = async () => {
+    if (groups.length > 0) {
+      const groupsCollection = collection(db, "chats");
+      const data = await getDocs(groupsCollection);
+      const filteredData = data.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      const myGroups = filteredData.filter((group) =>
+        groups.includes(group.id)
+      );
+
+      setGroups(myGroups);
+    }
+  };
+
+  useEffect(() => {
+    getGroups();
+  }, [userFirestore]);
 
   const handleSearch = () => {
     if (searchValue.length > 0) {
@@ -82,7 +107,7 @@ const Sidebar = () => {
 
   return (
     <div className="sidebar">
-      {username ? (
+      {username || location.pathname !== "/" ? (
         <div className="back-to-home-div">
           <button
             className="back-to-home"
@@ -153,10 +178,10 @@ const Sidebar = () => {
         <div className="freinds-div">
           <p className="to-chat-p">Friends</p>
           {friends.length > 0 ? (
-            friends.map((friend) => (
+            friends.map((friend, i) => (
               <div
                 className="friend-div"
-                key={friend.id}
+                key={i}
                 onClick={() => {
                   navigate("/chat/" + friend.username);
                   window.location.reload();
@@ -197,10 +222,22 @@ const Sidebar = () => {
 
           {isCreateGroupOpen ? <NewGroup /> : null}
 
-          {userFirestore.length > 0 && userFirestore[0].groups.length > 0 ? (
-            userFirestore[0].groups.map((group) => (
-              <div className="firend-div" key={group.id}>
-                {group.username}
+          {groups.length > 0 ? (
+            groups.map((group) => (
+              <div
+                className="group-div"
+                onClick={() => {
+                  navigate("/group/" + group.groupName);
+                  window.location.reload();
+                }}
+                key={group.id}
+              >
+                {group.imageURL !== "" ? (
+                  <img className="group-pfp" src={group.imageURL} />
+                ) : (
+                  <img className="group-pfp" src={grouppfp} />
+                )}
+                <p className="group-p">{group.groupName}</p>
               </div>
             ))
           ) : (

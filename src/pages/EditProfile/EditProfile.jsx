@@ -117,7 +117,8 @@ const EditProfile = () => {
 
         if (
           usernames.includes(values.username) ||
-          invalidUsernames.includes(values.username.toLowerCase())
+          invalidUsernames.includes(values.username.toLowerCase()) ||
+          values.username.includes(" ")
         ) {
           alert(
             "Username already exists or is not allowed! Please choose a different one."

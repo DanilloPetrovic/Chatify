@@ -1,165 +1,152 @@
 .chat {
   display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
 }
 
-.chat-div {
-  position: relative;
-  width: 70%;
+.sidebar-div {
+  flex: 1;
+  background-color: #1a2a32;
+  transition: height 0.3s ease;
+  overflow-y: auto;
+}
+
+.sidebar-div.extended {
+  height: auto; /* Allows it to extend beyond 100vh */
+}
+
+.main-div {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  background-color: #20392e;
+  color: #dcdcdc;
 }
 
 .chat-header {
-  background-color: #20392e;
-  height: 80px;
   display: flex;
   align-items: center;
-  padding: 0px 20px;
+  padding: 10px;
   cursor: pointer;
-  transition: 0.2s;
-  box-shadow: 0px 0px 2px;
-}
-
-.chat-header:hover {
-  background-color: #1e352b;
+  background-color: #20392e;
+  box-shadow: 0 2px 5px -2px black;
 }
 
 .header-container {
   display: flex;
   align-items: center;
-  gap: 20px;
-  color: white;
-  font-weight: bold;
 }
 
-.header-container img {
-  width: 50px;
-  height: 50px;
-  border-radius: 100%;
-  border: 1px solid white;
+.header-img-div img {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border: 2px solid white;
 }
 
-.header-container p {
-  font-size: 23px;
-}
-
-.inputs-header-div {
-  display: flex;
-  justify-content: center;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  margin-bottom: 10px;
-  gap: 10px;
-}
-
-.inputs-header-div input {
-  width: 80%;
-  padding: 15px;
-  font-size: 18px;
-  border-radius: 20px;
-  border: none;
-  background-color: #d9d9d9;
-}
-
-.emoji-picker-button {
-  border: none;
-  color: #b7b597;
-  font-size: 30px;
-  background-color: transparent;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.emoji-picker-button:hover {
-  transform: scale(1.1);
-}
-
-.chat-send-button {
-  background-color: #b7b597;
-  border: 3px solid #dad3be;
-  color: white;
-  width: 10%;
-  font-size: 20px;
-  font-weight: bold;
-  border-radius: 100px;
-  cursor: pointer;
-}
-
-.emoji-div {
-  display: flex;
-  align-items: center;
-  position: relative;
-}
-
-.picker {
-  position: absolute;
-  bottom: 60px;
-  right: 50px;
+.header-username-div p {
+  margin-left: 10px;
 }
 
 .main-chat {
-  width: 100%;
+  flex: 1;
   padding: 20px;
-  box-sizing: border-box;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  /* margin-bottom: 50px; */
 }
 
 .all-messages-div {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  font-size: 18px;
+}
+
+.my-message-div,
+.other-message-div {
+  display: flex;
+  margin-bottom: 10px;
 }
 
 .my-message-div {
-  display: flex;
   justify-content: flex-end;
 }
 
 .other-message-div {
-  display: flex;
   justify-content: flex-start;
 }
 
 .message-content {
   display: flex;
-  gap: 10px;
-  max-width: 60%;
-}
-
-.my-message-div .message-content {
-  flex-direction: row-reverse;
-  background-color: #dad3be;
-  color: white;
-  border-radius: 10px;
-  padding: 10px;
-}
-
-.other-message-div .message-content {
+  align-items: center;
   background-color: #b7b597;
-  color: white;
-  border-radius: 10px;
   padding: 10px;
+  border-radius: 10px;
+  max-width: 60%;
+  gap: 10px;
 }
 
-.my-message-div img,
-.other-message-div img {
-  width: 30px;
-  height: 30px;
-  border-radius: 100%;
+.my-message-p,
+.message-content p {
+  margin: 0;
+  color: #dcdcdc;
 }
 
 .my-message-p {
-  margin: 0;
+  margin-right: 10px;
 }
 
-.all-messages-div {
+.message-content img {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+}
+
+.inputs-header-div {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 70vh;
-  overflow-y: auto;
-  padding-right: 10px;
+  align-items: center;
+  padding: 10px;
+  background-color: #20392e;
+}
+
+.inputs-header-div input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #b7b597;
+  color: white;
+}
+
+.inputs-header-div input::placeholder {
+  color: white;
+}
+
+.chat-send-button {
+  margin-left: 10px;
+  padding: 10px 20px;
+  background-color: #b7b597;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+.emoji-div {
+  position: relative;
+  margin-left: 10px;
+}
+
+.emoji-picker-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #dcdcdc;
+  font-size: 20px;
+}
+
+.picker {
+  position: absolute;
+  bottom: 40px;
+  right: 0;
 }

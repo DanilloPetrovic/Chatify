@@ -1,32 +1,34 @@
-import React, { useState, useEffect, useRef } from "react";
-import "./Chat.css";
-import Sidebar from "../../components/Sidebar/Sidebar";
-import { auth, db } from "../../firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import {
-  getDocs,
-  collection,
-  onSnapshot,
-  updateDoc,
-  doc,
-} from "firebase/firestore";
+import React, { useState, useRef, useEffect } from "react";
+import "./Group.css";
 import { useParams, useNavigate } from "react-router-dom";
+import { auth, db } from "../../firebase";
+import {
+  collection,
+  getDocs,
+  onSnapshot,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import Sidebar from "../../components/Sidebar/Sidebar";
+import grouppfp from "../../photos/Untitled design (5).png";
+import { useFormik } from "formik";
 import EmojiPicker from "emoji-picker-react";
 import { FaSmile } from "react-icons/fa";
-import nopfp from "../../photos/nopfp.png";
-import { useFormik } from "formik";
 import * as Yup from "yup";
+import nopfp from "../../photos/nopfp.png";
 import Loading from "../../components/Loading/Loading";
 
-const Chat = () => {
+const Group = () => {
   const [user, setUser] = useState(); // auth.currentUser
   const [ownProfile, setOwnProfile] = useState(); // profil u kome smo ulogovani sa podacima iz firestore
-  const [userFirestore, setUserFirestore] = useState(); // podaci profila koji se prikazuje na stranici iz firestore
-  const { username } = useParams(); // varijabla koja cuva username iz url linka da bismo prepoznali profil
   const [isLoading, setIsLoading] = useState(true); // varijabla koja pokrece loading window
+  const { groupname } = useParams(); // varijabla koja cuva username iz url linka da bismo prepoznali profil
   const [isOpen, setIsOpen] = useState(false);
   const [currentChat, setCurrentChat] = useState([]);
+  const [members, setMembers] = useState([]);
 
+  const userCollection = collection(db, "users");
   const navigate = useNavigate();
   const endRef = useRef(null);
 
@@ -43,49 +45,57 @@ const Chat = () => {
 
   // funkcija za dobjianje potrebnih informacija od profila
   const getUserFirestore = async (displayName) => {
-    const userCollection = collection(db, "users");
     const data = await getDocs(userCollection);
     const filteredData = data.docs.map((doc) => ({
       ...doc.data(),
       id: doc.id,
     }));
 
-    const userFirestoreVar = filteredData.find(
-      (user) => user.username === username
-    );
-
     const ownProfileVar = filteredData.find(
       (user) => user.username === displayName
     );
 
     setOwnProfile(ownProfileVar);
-    setUserFirestore(userFirestoreVar);
-
     setIsLoading(false);
   };
 
   useEffect(() => {
-    if (ownProfile && userFirestore) {
+    if (ownProfile) {
       const chatsCollection = collection(db, "chats");
       const unsubscribe = onSnapshot(chatsCollection, (snapshot) => {
         const filteredData = snapshot.docs
           .map((doc) => ({ id: doc.id, ...doc.data() }))
-          .filter(
-            (chat) =>
-              chat.users.includes(userFirestore.id) &&
-              chat.users.includes(ownProfile.id) &&
-              chat.chatType === "normal"
-          );
+          .filter((chat) => chat.groupName === groupname);
 
         setCurrentChat(filteredData);
       });
 
       return () => unsubscribe();
     }
-  }, [ownProfile, userFirestore]);
+  }, [ownProfile]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [currentChat]);
+
+  const getMembers = async () => {
+    if (currentChat.length > 0) {
+      const data = await getDocs(userCollection);
+      const filteredData = data.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      const membersRef = filteredData.filter((user) =>
+        currentChat[0].users.includes(user.id)
+      );
+
+      setMembers(membersRef);
+    }
+  };
+
+  useEffect(() => {
+    getMembers();
   }, [currentChat]);
 
   const handleEmoji = (e) => {
@@ -134,27 +144,32 @@ const Chat = () => {
         <Sidebar />
       </div>
 
-      <div className="main-div chat-div">
-        <div className="chat-header" onClick={() => navigate("/" + username)}>
-          {userFirestore ? (
+      <div className="chat-div main-div">
+        <div
+          className="chat-header"
+          onClick={() =>
+            navigate("/group/" + currentChat[0].groupName + "/info")
+          }
+        >
+          {currentChat[0] ? (
             <div className="header-container">
               <div className="header-img-div">
-                {userFirestore.imageURL.length > 0 ? (
-                  <img src={userFirestore.imageURL} alt="Profile" />
+                {currentChat[0].imageURL.length > 0 ? (
+                  <img src={currentChat[0].imageURL} alt="Profile" />
                 ) : (
-                  <img src={nopfp} alt="No Profile" />
+                  <img src={grouppfp} alt="No Profile" />
                 )}
               </div>
 
               <div className="header-username-div">
-                <p>{userFirestore.username}</p>
+                <p>{currentChat[0].groupName}</p>
               </div>
             </div>
           ) : null}
         </div>
 
         <div className="main-chat">
-          {currentChat.length > 0 && userFirestore && ownProfile ? (
+          {currentChat.length > 0 && members.length > 0 && ownProfile ? (
             <div className="all-messages-div">
               {currentChat[0].messages.map((message, index) =>
                 message.senderId === ownProfile.id ? (
@@ -171,11 +186,23 @@ const Chat = () => {
                 ) : (
                   <div className="other-message-div" key={index}>
                     <div className="message-content">
-                      {userFirestore.imageURL.length > 0 ? (
-                        <img src={userFirestore.imageURL} alt="Other Profile" />
-                      ) : (
-                        <img src={nopfp} alt="No Profile" />
-                      )}
+                      {members
+                        .filter((user) => user.id === message.senderId)
+                        .map((user) =>
+                          user.imageURL.length > 0 ? (
+                            <img
+                              style={{ cursor: "pointer" }}
+                              onClick={() => navigate("/" + user.username)}
+                              src={user.imageURL}
+                            />
+                          ) : (
+                            <img
+                              style={{ cursor: "pointer" }}
+                              onClick={() => navigate("/" + user.username)}
+                              src={nopfp}
+                            />
+                          )
+                        )}
                       <p>{message.messageText}</p>
                     </div>
                   </div>
@@ -221,4 +248,4 @@ const Chat = () => {
   );
 };
 
-export default Chat;
+export default Group;

@@ -1,0 +1,113 @@
+.group-info {
+  display: flex;
+}
+
+.group-info-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.grouppfp-groupname-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.members-admins {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 100px;
+}
+
+.members-admins div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.members-admins div h6 {
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.members-admins div p {
+  font-size: 25px;
+  font-weight: 100;
+}
+
+.group-info-down-div {
+  background-color: #20392e;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 20px;
+  width: 80%;
+  display: flex;
+  gap: 20px;
+}
+
+.group-info-down-div div {
+  width: 50%;
+}
+
+.group-info-down-div div h6 {
+  font-size: 25px;
+  text-align: center;
+}
+
+.admin-user-div,
+.member-user-div {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
+  background-color: #b7b597;
+  width: 100% !important;
+  margin-top: 10px;
+  border: 3px solid #dad3be;
+  border-radius: 20px;
+}
+
+.admin-user-div p,
+.member-user-div p {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.group-info-down-div img {
+  width: 40px;
+  height: 40px;
+  border: 1px solid white;
+  border-radius: 100%;
+  margin: 10px 0px 10px 10px;
+}
+
+.group-info-buttons {
+  margin-top: 20px;
+}
+
+.edit-leave-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+}
+
+.edit-group-button,
+.leave-group-button {
+  background-color: #b7b597;
+  border: 3px solid #dad3be;
+  color: white;
+  width: 200px;
+  height: 50px;
+  font-size: 23px;
+  font-weight: bold;
+  border-radius: 100px;
+  cursor: pointer;
+  margin-top: 10px;
+}

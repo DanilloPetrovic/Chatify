@@ -6,6 +6,8 @@ import LogIn from "./pages/LogIn/LogIn";
 import Profile from "./pages/Profile/Profile";
 import EditProfile from "./pages/EditProfile/EditProfile";
 import Chat from "./pages/Chat/Chat";
+import Group from "./pages/Group/Group";
+import GroupInfo from "./pages/GroupInfo/GroupInfo";
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
         <Route path="/:username" element={<Profile />} />
         <Route path="/edit-profile/:username" element={<EditProfile />} />
         <Route path="/chat/:username" element={<Chat />} />
+        <Route path="/group/:groupname" element={<Group />} />
+        <Route path="/group/:groupname/info" element={<GroupInfo />} />
       </Routes>
     </BrowserRouter>
   );

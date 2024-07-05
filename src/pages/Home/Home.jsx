@@ -38,7 +38,7 @@ const Home = () => {
         <Sidebar />
       </div>
 
-      <div className="main-div chat"></div>
+      <div className="main-div home-div"></div>
     </div>
   );
 };
