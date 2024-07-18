@@ -115,7 +115,6 @@ const Group = () => {
     onSubmit: async (values) => {
       if (ownProfile && currentChat.length > 0) {
         const chatDocRef = doc(db, "chats", currentChat[0].id);
-        console.log(chatDocRef);
         const messageConstructor = {
           messageText: values.message,
           senderId: ownProfile.id,
@@ -171,43 +170,54 @@ const Group = () => {
         <div className="main-chat">
           {currentChat.length > 0 && members.length > 0 && ownProfile ? (
             <div className="all-messages-div">
-              {currentChat[0].messages.map((message, index) =>
-                message.senderId === ownProfile.id ? (
-                  <div className="my-message-div" key={index}>
-                    <div className="message-content">
-                      <p className="my-message-p">{message.messageText}</p>
-                      {ownProfile.imageURL.length > 0 ? (
-                        <img src={ownProfile.imageURL} alt="My Profile" />
-                      ) : (
-                        <img src={nopfp} alt="No Profile" />
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="other-message-div" key={index}>
-                    <div className="message-content">
-                      {members
-                        .filter((user) => user.id === message.senderId)
-                        .map((user) =>
-                          user.imageURL.length > 0 ? (
-                            <img
-                              style={{ cursor: "pointer" }}
-                              onClick={() => navigate("/" + user.username)}
-                              src={user.imageURL}
-                            />
-                          ) : (
-                            <img
-                              style={{ cursor: "pointer" }}
-                              onClick={() => navigate("/" + user.username)}
-                              src={nopfp}
-                            />
-                          )
+              {currentChat[0].messages.map((message, index) => (
+                <div key={index}>
+                  {message.senderId === ownProfile.id ? (
+                    <div className="my-message-div">
+                      <div className="message-content">
+                        <p className="my-message-p">{message.messageText}</p>
+                        {ownProfile.imageURL.length > 0 ? (
+                          <img src={ownProfile.imageURL} alt="My Profile" />
+                        ) : (
+                          <img src={nopfp} alt="No Profile" />
                         )}
-                      <p>{message.messageText}</p>
+                      </div>
                     </div>
-                  </div>
-                )
-              )}
+                  ) : message.senderId !== ownProfile.id &&
+                    message.senderId !== "group" ? (
+                    <div className="other-message-div">
+                      <div className="message-content">
+                        {members
+                          .filter((user) => user.id === message.senderId)
+                          .map((user) => (
+                            <img
+                              key={user.id}
+                              style={{ cursor: "pointer" }}
+                              onClick={() => navigate("/" + user.username)}
+                              src={
+                                user.imageURL.length > 0 ? user.imageURL : nopfp
+                              }
+                              alt={user.username}
+                            />
+                          ))}
+                        <p>{message.messageText}</p>
+                      </div>
+                    </div>
+                  ) : message.senderId !== ownProfile.id &&
+                    message.senderId === "group" ? (
+                    <div className="group-alert-div">
+                      {members
+                        .filter((member) => member.id === message.changeUserId)
+                        .map((user) => (
+                          <p className="group-alert-p" key={user.id}>
+                            {user.username}{" "}
+                            {message.messageContent.substring(20)}
+                          </p>
+                        ))}
+                    </div>
+                  ) : null}
+                </div>
+              ))}
               <div ref={endRef}></div>
             </div>
           ) : null}

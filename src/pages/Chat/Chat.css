@@ -13,7 +13,7 @@
 }
 
 .sidebar-div.extended {
-  height: auto; /* Allows it to extend beyond 100vh */
+  height: auto;
 }
 
 .main-div {

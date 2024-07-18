@@ -8,6 +8,7 @@ import EditProfile from "./pages/EditProfile/EditProfile";
 import Chat from "./pages/Chat/Chat";
 import Group from "./pages/Group/Group";
 import GroupInfo from "./pages/GroupInfo/GroupInfo";
+import EditGroup from "./pages/EditGroup/EditGroup";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/chat/:username" element={<Chat />} />
         <Route path="/group/:groupname" element={<Group />} />
         <Route path="/group/:groupname/info" element={<GroupInfo />} />
+        <Route path="/group/:groupname/edit" element={<EditGroup />} />
       </Routes>
     </BrowserRouter>
   );

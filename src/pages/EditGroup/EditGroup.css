@@ -1,0 +1,175 @@
+.edit-group-all {
+  display: flex;
+}
+
+.edit-group-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 50px 0px;
+}
+
+.input-group-pfp-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.group-name-input {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.group-name-input input {
+  width: 50%;
+  padding: 10px 20px;
+  border-radius: 100px;
+  font-size: 20px;
+  font-weight: bold;
+  background-color: #b7b597;
+  border: 3px solid #dad3be;
+  color: white;
+  cursor: default;
+  margin-top: 20px;
+}
+
+.add {
+  padding: 10px 15px;
+  background-color: #b7b597;
+  color: white;
+  border: none;
+  font-weight: bold;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.add:hover {
+  background-color: #979577;
+}
+
+.x {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 10px;
+  margin-right: 10px;
+  transition: 0.2s;
+  padding: 10px;
+}
+
+.x:hover {
+  background-color: #979577;
+  border-radius: 10px;
+}
+
+.search-input-add-member {
+  height: 20px;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.friends-edit-group {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: #b7b597;
+  margin-top: 5px;
+  border-radius: 10px;
+  border: 3px solid #dad3be;
+  font-weight: bold;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.add-member {
+  background-color: #20392e;
+  padding: 20px;
+  margin: 20px 0px;
+  border-radius: 10px;
+  width: 50%;
+}
+
+.search-result-div-group {
+  width: 100%;
+  background-color: #b7b597;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  display: flex;
+  justify-content: start;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 5px;
+  cursor: pointer;
+  align-items: center;
+  gap: 10px;
+}
+
+.add-member h6 {
+  font-size: 30px;
+}
+
+.search-pfp {
+  width: 30px;
+  height: 30px;
+  border-radius: 100%;
+  border: 1px solid white;
+}
+
+.group-info-members-edit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.add-admin-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background-color: white;
+  padding: 20px;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.popup-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.popup-content img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.popup-content button {
+  margin: 5px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.popup-content button:hover {
+  background-color: #0056b3;
+}

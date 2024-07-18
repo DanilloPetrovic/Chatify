@@ -108,6 +108,7 @@ const NewGroup = () => {
           groupName: groupName,
           groupAdmin: [userFirestore[0].id],
           imageURL: "",
+          groupAlert: [],
         };
 
         // kreiranje grupe u firebase

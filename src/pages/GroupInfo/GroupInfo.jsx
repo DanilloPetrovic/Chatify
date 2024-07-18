@@ -2,7 +2,15 @@ import React, { useState, useEffect } from "react";
 import "./GroupInfo.css";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { db, auth } from "../../firebase";
-import { collection, getDocs, setUser, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  setUser,
+  onSnapshot,
+  doc,
+  updateDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import grouppfp from "../../photos/Untitled design (5).png";
@@ -91,6 +99,50 @@ const GroupInfo = () => {
     getMembersAndAdmins();
   }, [currentChat]);
 
+  const handleLeaveGroup = async () => {
+    if (ownProfile && currentChat) {
+      // uzimanje dokumenata iz firebase
+      const ownProfileDocRef = doc(db, "users", ownProfile.id);
+      const currentChatDocRef = doc(db, "chats", currentChat.id);
+
+      // kreiranje updateovanih nizova
+      const updatedOwnProfileGroupArr = ownProfile.groups.filter(
+        (group) => group !== currentChat.id
+      );
+
+      const updatedGroupUsersArr = currentChat.users.filter(
+        (user) => user !== ownProfile.id
+      );
+
+      const updatedGroupAdminArr = currentChat.groupAdmin.filter(
+        (user) => user !== ownProfile.id
+      );
+
+      try {
+        await updateDoc(ownProfileDocRef, {
+          groups: updatedOwnProfileGroupArr,
+        });
+
+        await updateDoc(currentChatDocRef, {
+          users: updatedGroupUsersArr,
+          groupAdmin: updatedGroupAdminArr,
+        });
+
+        if (updatedGroupAdminArr.length === 0) {
+          await updateDoc(currentChatDocRef, {
+            groupAdmin: [...updatedGroupAdminArr, updatedGroupUsersArr[0]],
+          });
+        }
+
+        navigate("/");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  console.log(currentChat);
+
   return (
     <div className="group-info">
       <div className="sidebar-div">
@@ -130,8 +182,8 @@ const GroupInfo = () => {
           <div className="group-info-admins-div">
             <h6>Admins</h6>
             {currentChat && admins.length > 0
-              ? admins.map((user) => (
-                  <div className="admin-user-div">
+              ? admins.map((user, i) => (
+                  <div className="admin-user-div" key={i}>
                     {user.imageURL.length > 0 ? (
                       <img src={user.imageURL} />
                     ) : (
@@ -172,10 +224,20 @@ const GroupInfo = () => {
                   >
                     Edit Group
                   </button>
-                  <button className="leave-group-button">Leave Group</button>
+                  <button
+                    className="leave-group-button"
+                    onClick={handleLeaveGroup}
+                  >
+                    Leave Group
+                  </button>
                 </div>
               ) : (
-                <button className="leave-group-button">Leave Group</button>
+                <button
+                  className="leave-group-button"
+                  onClick={handleLeaveGroup}
+                >
+                  Leave Group
+                </button>
               )}
             </div>
           ) : null}

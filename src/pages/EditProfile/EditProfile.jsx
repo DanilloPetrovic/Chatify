@@ -149,9 +149,6 @@ const EditProfile = () => {
     },
   });
 
-  console.log(imageUrls[0], "ulrs");
-  console.log(imageInput, "input");
-
   if (isLoading) {
     return <Loading />;
   }
