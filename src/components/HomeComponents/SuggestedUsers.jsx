@@ -3,6 +3,7 @@ import { auth, getAllUsers } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import nopfp from "../../photos/nopfp.png";
 import { useNavigate } from "react-router-dom";
+import loadingGif from "../../photos/Rolling@1x-1.9s-200px-200px.gif";
 
 const SuggestedUsers = () => {
   const [user, setUser] = useState(null);
@@ -81,8 +82,6 @@ const SuggestedUsers = () => {
     fetchWeather();
   }, [city, apiKey]);
 
-  console.log(weatherData);
-
   return (
     <div className="suggested-users">
       <div className="suggetsted-users-div">
@@ -113,7 +112,7 @@ const SuggestedUsers = () => {
 
       <div className="weather-div">
         <h3>Weather</h3>
-        {weatherData && (
+        {weatherData ? (
           <div className="weather-div-info">
             <div className="weather-div-header">
               <div>
@@ -131,6 +130,10 @@ const SuggestedUsers = () => {
                 />
               </div>
             </div>
+          </div>
+        ) : (
+          <div className="no-weather-div">
+            <img className="no-weather" src={loadingGif} />
           </div>
         )}
       </div>

@@ -2,3 +2,36 @@
   display: flex;
   height: 100vh;
 }
+
+.pfp-username-message-group {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
+}
+
+.message-content-group {
+  display: block;
+}
+
+.username-group:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.message-time {
+  margin-top: 5px !important;
+  font-size: 12px;
+  color: rgb(200, 200, 200);
+}
+
+.pfp-message-group {
+  display: flex;
+  justify-content: end;
+  gap: 10px;
+  align-items: center;
+}
+
+.my-message-group {
+  display: block;
+}

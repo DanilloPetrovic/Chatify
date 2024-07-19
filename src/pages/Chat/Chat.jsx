@@ -17,6 +17,7 @@ import nopfp from "../../photos/nopfp.png";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Loading from "../../components/Loading/Loading";
+import trash from "../../photos/Untitled design (9).png";
 
 const Chat = () => {
   const [user, setUser] = useState(); // auth.currentUser
@@ -93,6 +94,22 @@ const Chat = () => {
     setIsOpen(false);
   };
 
+  const handleDelete = async (index) => {
+    const userResponse = window.confirm(
+      "Are you sure you want to delete this message?"
+    );
+
+    if (userResponse) {
+      if (currentChat.length > 0) {
+        const chatDocRef = doc(db, "chats", currentChat[0].id);
+        const updatedMessages = currentChat[0].messages.filter(
+          (_, i) => i !== index
+        );
+        await updateDoc(chatDocRef, { messages: updatedMessages });
+      }
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       message: "",
@@ -105,7 +122,6 @@ const Chat = () => {
     onSubmit: async (values) => {
       if (ownProfile && currentChat.length > 0) {
         const chatDocRef = doc(db, "chats", currentChat[0].id);
-        console.log(chatDocRef);
         const messageConstructor = {
           messageText: values.message,
           senderId: ownProfile.id,
@@ -123,6 +139,20 @@ const Chat = () => {
       }
     },
   });
+
+  const convertTime = (time) => {
+    if (!time || !time.toDate) {
+      return "N/A"; // Return a default value if time is not available
+    }
+    const toDateRef = time.toDate();
+    const toDateRefStr = toDateRef.toString();
+    const toDateRefArr = toDateRefStr.split(" ");
+
+    return `${toDateRefArr[1]} ${toDateRefArr[2]} ${toDateRefArr[4].substring(
+      0,
+      5
+    )}`;
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -159,24 +189,45 @@ const Chat = () => {
               {currentChat[0].messages.map((message, index) =>
                 message.senderId === ownProfile.id ? (
                   <div className="my-message-div" key={index}>
-                    <div className="message-content">
-                      <p className="my-message-p">{message.messageText}</p>
-                      {ownProfile.imageURL.length > 0 ? (
-                        <img src={ownProfile.imageURL} alt="My Profile" />
-                      ) : (
-                        <img src={nopfp} alt="No Profile" />
-                      )}
+                    <div className="message-content my-message-group">
+                      <div className="pfp-message-group">
+                        <p className="my-message-p">{message.messageText}</p>
+                        {ownProfile.imageURL.length > 0 ? (
+                          <img src={ownProfile.imageURL} alt="My Profile" />
+                        ) : (
+                          <img src={nopfp} alt="No Profile" />
+                        )}
+                      </div>
+                      <div className="time-delete-div">
+                        <p className="message-time">
+                          {convertTime(message.sendAt)}
+                        </p>
+                        <button
+                          className="delete-message"
+                          onClick={() => handleDelete(index)}
+                        >
+                          <img src={trash} alt="Delete" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ) : (
                   <div className="other-message-div" key={index}>
-                    <div className="message-content">
-                      {userFirestore.imageURL.length > 0 ? (
-                        <img src={userFirestore.imageURL} alt="Other Profile" />
-                      ) : (
-                        <img src={nopfp} alt="No Profile" />
-                      )}
-                      <p>{message.messageText}</p>
+                    <div className="message-content my-message-group">
+                      <div className="pfp-message-group">
+                        {userFirestore.imageURL.length > 0 ? (
+                          <img
+                            src={userFirestore.imageURL}
+                            alt="Other Profile"
+                          />
+                        ) : (
+                          <img src={nopfp} alt="No Profile" />
+                        )}
+                        <p className="send-at-p">{message.messageText}</p>
+                      </div>
+                      <p className="message-time">
+                        {convertTime(message.sendAt)}
+                      </p>
                     </div>
                   </div>
                 )

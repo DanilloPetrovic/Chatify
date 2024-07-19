@@ -186,8 +186,6 @@ const ProfileInfo = () => {
     }
   };
 
-  console.log(chats);
-
   return (
     <div className="profile-info-div">
       {auth.currentUser && userFirestore ? (

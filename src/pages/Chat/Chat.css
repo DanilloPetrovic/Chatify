@@ -7,7 +7,7 @@
 
 .sidebar-div {
   flex: 1;
-  background-color: #1a2a32;
+  background-color: #5b7668;
   transition: height 0.3s ease;
   overflow-y: auto;
 }
@@ -116,6 +116,7 @@
   border-radius: 5px;
   background-color: #b7b597;
   color: white;
+  font-size: 15px;
 }
 
 .inputs-header-div input::placeholder {
@@ -149,4 +150,28 @@
   position: absolute;
   bottom: 40px;
   right: 0;
+}
+
+.time-delete-div {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.delete-message {
+  background-color: transparent;
+  border: none;
+}
+
+.delete-message img {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.delete-message img:hover {
+  transform: scale(1.2);
 }

@@ -6,6 +6,8 @@ import PfpUsername from "../../components/ProfileComponents/PfpUsername";
 import FriendsGroups from "../../components/ProfileComponents/FriendsGropus";
 import ButtonsProfile from "../../components/ProfileComponents/ButtonsProfile";
 import ProfileInfo from "../../components/ProfileComponents/ProfileInfo";
+import MyStatuses from "../../components/ProfileComponents/MyStatuses";
+import { useParams } from "react-router-dom";
 
 const Profile = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,6 +30,8 @@ const Profile = () => {
         <ButtonsProfile />
 
         <ProfileInfo />
+
+        <MyStatuses />
       </div>
     </div>
   );
