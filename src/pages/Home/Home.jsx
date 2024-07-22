@@ -42,12 +42,12 @@ const Home = () => {
       </div>
 
       <div className="main-div home-div">
-        <p className="chatify">
-          Chatify<span className="chatify-span">©</span>
-        </p>
-        {user ? <HowDoYouFeelToday /> : null}
         <div className="main-of-main">
           <div className="all-status-div-home">
+            <p className="chatify">
+              Chatify<span className="chatify-span">©</span>
+            </p>
+            {user ? <HowDoYouFeelToday /> : null}
             {user ? <Statuses /> : null}
           </div>
           <div className="suggested-users-div-home">

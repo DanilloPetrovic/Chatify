@@ -11,7 +11,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import nopfp from "../../photos/nopfp.png";
 import grouppfp from "../../photos/Untitled design (5).png";
-import AddMember from "../../components/ProfileComponents/AddMember";
 
 const EditGroup = () => {
   const [user, setUser] = useState(null);

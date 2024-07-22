@@ -10,6 +10,7 @@ import {
   doc,
   updateDoc,
   serverTimestamp,
+  deleteDoc,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
@@ -132,6 +133,13 @@ const GroupInfo = () => {
           await updateDoc(currentChatDocRef, {
             groupAdmin: [...updatedGroupAdminArr, updatedGroupUsersArr[0]],
           });
+        }
+
+        if (
+          updatedGroupAdminArr.length === 0 &&
+          updatedGroupUsersArr.length === 0
+        ) {
+          await deleteDoc(currentChatDocRef);
         }
 
         navigate("/");
