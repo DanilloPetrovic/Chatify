@@ -21,6 +21,7 @@ const NewGroup = () => {
   const [searchResult, setSearchResult] = useState([]);
   const [friendsToAddInGroup, setFriendsToAddInGroup] = useState([]);
   const [groupName, setGroupName] = useState("");
+  const [groupNames, setGroupNames] = useState([]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -57,6 +58,19 @@ const NewGroup = () => {
     setIsLoading(false);
   };
 
+  const getAllGroupNames = async () => {
+    const allGroups = await getDocs(collection(db, "chats"));
+    const groupNamesRef = allGroups.docs
+      .filter((doc) => doc.data().chatType === "group")
+      .map((doc) => doc.data().groupName);
+
+    setGroupNames(groupNamesRef);
+  };
+
+  useEffect(() => {
+    getAllGroupNames();
+  }, []);
+
   const handleSearch = () => {
     if (searchValue.length > 0) {
       const searchValueLower = searchValue.toLowerCase();
@@ -89,7 +103,8 @@ const NewGroup = () => {
       groupName.length !== 0 &&
       friendsToAddInGroup.length <= 5 &&
       userFirestore &&
-      !groupName.includes(" ")
+      !groupName.includes(" ") &&
+      !groupNames.includes(groupName)
     ) {
       setIsLoading(true);
 
@@ -142,9 +157,7 @@ const NewGroup = () => {
         console.log(error);
       }
     } else {
-      alert(
-        "Group must have between 3 and 5 members and group name can't contain space :("
-      );
+      alert("Invalid data :(");
     }
 
     setIsLoading(false);

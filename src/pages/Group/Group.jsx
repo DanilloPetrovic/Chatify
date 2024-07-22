@@ -18,7 +18,7 @@ import { FaSmile } from "react-icons/fa";
 import * as Yup from "yup";
 import nopfp from "../../photos/nopfp.png";
 import Loading from "../../components/Loading/Loading";
-import trash from "../../photos/Untitled design (9).png";
+import trash from "../../photos/Untitled design (10).png";
 
 const Group = () => {
   const [user, setUser] = useState(); // auth.currentUser

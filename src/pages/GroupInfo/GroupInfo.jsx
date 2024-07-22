@@ -166,13 +166,13 @@ const GroupInfo = () => {
         <div className="members-admins-div">
           {currentChat ? (
             <div className="members-admins">
-              <div className="members-div">
-                <h6 className="members-h6">Members</h6>
-                <p className="admins-p">{currentChat.users.length}</p>
-              </div>
               <div className="admins-div">
                 <h6 className="admins-h6">Admins</h6>
                 <p className="admins-p">{currentChat.groupAdmin.length}</p>
+              </div>
+              <div className="members-div">
+                <h6 className="members-h6">Members</h6>
+                <p className="admins-p">{currentChat.users.length}</p>
               </div>
             </div>
           ) : null}

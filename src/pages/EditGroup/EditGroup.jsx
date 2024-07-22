@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./EditGroup.css";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import { db, auth, storage } from "../../firebase";
+import { db, auth, storage, getAllUsers } from "../../firebase";
 import Loading from "../../components/Loading/Loading";
 import { getDocs, collection, doc, updateDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
@@ -11,6 +11,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import nopfp from "../../photos/nopfp.png";
 import grouppfp from "../../photos/Untitled design (5).png";
+import AddMember from "../../components/ProfileComponents/AddMember";
 
 const EditGroup = () => {
   const [user, setUser] = useState(null);
@@ -22,9 +23,10 @@ const EditGroup = () => {
   const [members, setMembers] = useState([]);
   const [admins, setAdmins] = useState([]);
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+  const [friends, setFriends] = useState([]);
+  const [validFriends, setValidFriends] = useState([]);
+  const [groupNames, setGroupNames] = useState([]);
   const token = localStorage.getItem("token");
-  const [isAddAdminOpen, setIsAddAdminOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null); // New state for selected user
 
   const { groupname } = useParams();
   const userCollection = collection(db, "users");
@@ -52,7 +54,16 @@ const EditGroup = () => {
         try {
           const snapshot = await uploadBytes(storageRef, file);
           const url = await getDownloadURL(snapshot.ref);
+
+          // Update local state
           setImageUrls((prev) => [url, ...prev]);
+
+          // Update currentChat state
+          setCurrentChat((prev) => ({
+            ...prev,
+            imageURL: url,
+          }));
+
           console.log("Image uploaded successfully:", url);
         } catch (error) {
           console.error("Error uploading image:", error);
@@ -133,6 +144,91 @@ const EditGroup = () => {
     getMembersAndAdmins();
   }, [currentChat]);
 
+  const getFriends = async () => {
+    if (ownProfile) {
+      const allUsers = await getAllUsers();
+      const friendsRef = allUsers.filter((user) =>
+        ownProfile.friends.includes(user.id)
+      );
+
+      setFriends(friendsRef);
+    }
+  };
+
+  useEffect(() => {
+    getFriends();
+  }, []);
+
+  const getValidMembers = async () => {
+    if (ownProfile) {
+      const allUsers = await getAllUsers();
+      const friendsRef = allUsers.filter((user) =>
+        ownProfile.friends.includes(user.id)
+      );
+
+      const validFriendsRef = friendsRef.filter(
+        (friend) => !members.some((member) => member.id === friend.id)
+      );
+
+      setValidFriends(validFriendsRef);
+    }
+  };
+
+  useEffect(() => {
+    if (ownProfile && members.length > 0) {
+      getValidMembers();
+    }
+  }, [ownProfile, members]);
+
+  const handleAddMember = (friendId) => {
+    const updatedMembersLocal = [...currentChat.users, friendId];
+    setCurrentChat((prev) => ({ ...prev, users: updatedMembersLocal }));
+  };
+
+  const handleAddAdmin = (friendId) => {
+    const updatedAdminLocal = [...currentChat.groupAdmin, friendId];
+    setCurrentChat((prev) => ({ ...prev, groupAdmin: updatedAdminLocal }));
+  };
+
+  const handleRemoveMember = (friendId) => {
+    const updatedMemberLocal = [
+      ...currentChat.users.filter((user) => user !== friendId),
+    ];
+
+    const updatedAdminLocal = [
+      ...currentChat.groupAdmin.filter((user) => user !== friendId),
+    ];
+
+    setCurrentChat((prev) => ({
+      ...prev,
+      users: updatedMemberLocal,
+      groupAdmin: updatedAdminLocal,
+    }));
+  };
+
+  const handleRemoveAdmin = (friendId) => {
+    const updatedAdminLocal = [
+      ...currentChat.groupAdmin.filter((user) => user !== friendId),
+    ];
+
+    setCurrentChat((prev) => ({ ...prev, groupAdmin: updatedAdminLocal }));
+  };
+
+  const getAllGroupNames = async () => {
+    const allGroups = await getDocs(collection(db, "chats"));
+    const groupNamesRef = allGroups.docs
+      .filter((doc) => doc.data().chatType === "group")
+      .map((doc) => doc.data().groupName);
+
+    const finalGroupNames = groupNamesRef.filter((name) => name !== groupname);
+
+    setGroupNames(finalGroupNames);
+  };
+
+  useEffect(() => {
+    getAllGroupNames();
+  }, []);
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -146,8 +242,36 @@ const EditGroup = () => {
       groupName: Yup.string(),
     }),
 
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      setIsLoading(true);
+
+      // Add your new condition here
+      if (
+        formik.values.groupUsers.length >= 3 &&
+        formik.values.groupName.length !== 0 &&
+        formik.values.groupUsers.length <= 5 &&
+        ownProfile &&
+        !formik.values.groupName.includes(" ") &&
+        !groupNames.includes(formik.values.groupName)
+      ) {
+        try {
+          const groupDocRef = doc(groupCollection, currentChat.id);
+          await updateDoc(groupDocRef, {
+            imageURL: values.image,
+            groupName: values.groupName,
+            groupAdmin: values.admins,
+            users: values.groupUsers,
+          });
+          console.log("Group updated successfully");
+        } catch (error) {
+          console.error("Error updating group:", error);
+        }
+        navigate("/group/" + groupname);
+      } else {
+        alert("Please ensure that all conditions are met.");
+      }
+
+      setIsLoading(false);
     },
   });
 
@@ -203,12 +327,21 @@ const EditGroup = () => {
             {currentChat && admins.length > 0
               ? admins.map((user) => (
                   <div className="admin-user-div" key={user.id}>
-                    {user.imageURL.length > 0 ? (
-                      <img src={user.imageURL} alt="Admin" />
-                    ) : (
-                      <img src={nopfp} alt="Admin" />
-                    )}
-                    <p>{user.username}</p>
+                    <div className="pfp-username-add-member">
+                      {user.imageURL.length > 0 ? (
+                        <img src={user.imageURL} alt="Admin" />
+                      ) : (
+                        <img src={nopfp} alt="Admin" />
+                      )}
+                      <p>{user.username}</p>
+                    </div>
+                    {user.id !== ownProfile.id ? (
+                      <div className="member-buttons">
+                        <button onClick={() => handleRemoveAdmin(user.id)}>
+                          Remove Admin
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                 ))
               : null}
@@ -222,20 +355,69 @@ const EditGroup = () => {
                     key={user.id}
                     onClick={() => {}}
                   >
-                    {user.imageURL.length > 0 ? (
-                      <img src={user.imageURL} alt="Member" />
-                    ) : (
-                      <img src={nopfp} alt="Member" />
-                    )}
-                    <p>{user.username}</p>
+                    <div className="pfp-username-add-member">
+                      {user.imageURL.length > 0 ? (
+                        <img src={user.imageURL} alt="Member" />
+                      ) : (
+                        <img src={nopfp} alt="Member" />
+                      )}
+                      <p>{user.username}</p>
+                    </div>
+
+                    {user.id !== ownProfile.id ? (
+                      <div className="member-buttons">
+                        {currentChat.groupAdmin.includes(user.id) ? null : (
+                          <button onClick={() => handleAddAdmin(user.id)}>
+                            New admin
+                          </button>
+                        )}
+
+                        <button onClick={() => handleRemoveMember(user.id)}>
+                          Remove
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                 ))
               : null}
-            <button className="add">Add member</button>
+            <button
+              onClick={() => setIsAddMemberOpen((prev) => !prev)}
+              className="add"
+            >
+              Add member
+            </button>
           </div>
         </div>
 
-        <button className="save-button">Save</button>
+        {isAddMemberOpen ? (
+          <div className="potencial-new-members">
+            {validFriends.length > 0 ? (
+              validFriends.map((friend) => (
+                <div className="add-member-div">
+                  <div className="pfp-username-add-member">
+                    {friend.imageURL.length > 0 ? (
+                      <img src={friend.imageURL} />
+                    ) : (
+                      <img src={nopfp} />
+                    )}
+                    <p>{friend.username}</p>
+                  </div>
+                  <div>
+                    <button onClick={() => handleAddMember(friend.id)}>
+                      Add
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>all your friends are in the group</p>
+            )}
+          </div>
+        ) : null}
+
+        <button onClick={formik.handleSubmit} className="save-button">
+          Save
+        </button>
       </div>
     </div>
   );

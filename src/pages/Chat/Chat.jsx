@@ -17,7 +17,7 @@ import nopfp from "../../photos/nopfp.png";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Loading from "../../components/Loading/Loading";
-import trash from "../../photos/Untitled design (9).png";
+import trash from "../../photos/Untitled design (10).png";
 
 const Chat = () => {
   const [user, setUser] = useState(); // auth.currentUser
