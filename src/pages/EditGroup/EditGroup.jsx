@@ -3,7 +3,13 @@ import "./EditGroup.css";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { db, auth, storage, getAllUsers } from "../../firebase";
 import Loading from "../../components/Loading/Loading";
-import { getDocs, collection, doc, updateDoc } from "firebase/firestore";
+import {
+  getDocs,
+  collection,
+  doc,
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useParams, useNavigate } from "react-router-dom";
 import { uploadBytes, getDownloadURL, ref } from "firebase/storage";
@@ -36,7 +42,7 @@ const EditGroup = () => {
     const importImg = async () => {
       if (imageInput && imageInput[0]) {
         const file = imageInput[0];
-        const maxSize = 5 * 1024 * 1024; // 5 MB
+        const maxSize = 5 * 1024 * 1024;
         const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
 
         if (file.size > maxSize) {
@@ -54,10 +60,8 @@ const EditGroup = () => {
           const snapshot = await uploadBytes(storageRef, file);
           const url = await getDownloadURL(snapshot.ref);
 
-          // Update local state
           setImageUrls((prev) => [url, ...prev]);
 
-          // Update currentChat state
           setCurrentChat((prev) => ({
             ...prev,
             imageURL: url,
@@ -189,7 +193,7 @@ const EditGroup = () => {
     setCurrentChat((prev) => ({ ...prev, groupAdmin: updatedAdminLocal }));
   };
 
-  const handleRemoveMember = (friendId) => {
+  const handleRemoveMember = async (friendId) => {
     const updatedMemberLocal = [
       ...currentChat.users.filter((user) => user !== friendId),
     ];
@@ -203,6 +207,29 @@ const EditGroup = () => {
       users: updatedMemberLocal,
       groupAdmin: updatedAdminLocal,
     }));
+
+    try {
+      const groupDocRef = doc(db, "chats", currentChat.id);
+      await updateDoc(groupDocRef, {
+        users: updatedMemberLocal,
+        groupAdmin: updatedAdminLocal,
+      });
+
+      const userDocRef = doc(db, "users", friendId);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const userGroups = userData.groups || [];
+        const updatedGroups = userGroups.filter(
+          (groupId) => groupId !== currentChat.id
+        );
+        await updateDoc(userDocRef, {
+          groups: updatedGroups,
+        });
+      }
+    } catch (error) {
+      console.error("Error removing member from group:", error);
+    }
   };
 
   const handleRemoveAdmin = (friendId) => {
@@ -236,15 +263,11 @@ const EditGroup = () => {
       groupUsers: currentChat?.users || [],
       admins: currentChat?.groupAdmin || [],
     },
-
     validationSchema: Yup.object().shape({
       groupName: Yup.string(),
     }),
-
     onSubmit: async (values) => {
       setIsLoading(true);
-
-      // Add your new condition here
       if (
         formik.values.groupUsers.length >= 3 &&
         formik.values.groupName.length !== 0 &&
@@ -261,7 +284,21 @@ const EditGroup = () => {
             groupAdmin: values.admins,
             users: values.groupUsers,
           });
-          console.log("Group updated successfully");
+
+          const usersToUpdate = [...formik.values.groupUsers];
+          for (const userId of usersToUpdate) {
+            const userDocRef = doc(db, "users", userId);
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              const userGroups = userData.groups || [];
+              if (!userGroups.includes(currentChat.id)) {
+                await updateDoc(userDocRef, {
+                  groups: [...userGroups, currentChat.id],
+                });
+              }
+            }
+          }
         } catch (error) {
           console.error("Error updating group:", error);
         }
@@ -269,10 +306,27 @@ const EditGroup = () => {
       } else {
         alert("Please ensure that all conditions are met.");
       }
-
       setIsLoading(false);
     },
   });
+
+  useEffect(() => {
+    const checkGroupAccess = async () => {
+      if (user && currentChat) {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const userGroups = userData.groups || [];
+          if (!userGroups.includes(currentChat.id)) {
+            navigate("/");
+          }
+        }
+      }
+    };
+
+    checkGroupAccess();
+  }, [user, currentChat, navigate]);
 
   if (isLoading) {
     return <Loading />;
@@ -409,7 +463,7 @@ const EditGroup = () => {
                 </div>
               ))
             ) : (
-              <p>all your friends are in the group</p>
+              <p className="ayfaitg">All your friends are in the group</p>
             )}
           </div>
         ) : null}

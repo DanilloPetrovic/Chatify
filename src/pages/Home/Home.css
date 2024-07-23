@@ -51,8 +51,10 @@
 }
 
 .hdyft-textarea {
-  width: 50%;
-  height: 80px;
+  max-width: 50%;
+  min-width: 50%;
+  max-height: 80px;
+  min-height: 80px;
   padding: 15px;
   font-size: 20px;
   border: none;
