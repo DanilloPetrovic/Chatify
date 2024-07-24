@@ -11,7 +11,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { uploadBytes, getDownloadURL, ref } from "firebase/storage";
 import { useFormik } from "formik";
 import * as Yup from "yup";

@@ -8,6 +8,7 @@ import Loading from "../../components/Loading/Loading";
 import HowDoYouFeelToday from "../../components/HomeComponents/HowDoYouFeelToday";
 import Statuses from "../../components/HomeComponents/Statuses";
 import SuggestedUsers from "../../components/HomeComponents/SuggestedUsers";
+import ResponsiveSidebar from "../../components/Sidebar/ResponsiveSidebar";
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -39,6 +40,10 @@ const Home = () => {
     <div className="Home">
       <div className="sidebar-div">
         <Sidebar />
+      </div>
+
+      <div className="responsive-sidebar-div">
+        <ResponsiveSidebar />
       </div>
 
       <div className="main-div home-div">

@@ -17,7 +17,13 @@
   width: 200px;
   border-radius: 100px;
   border: 3px solid white;
-  margin-top: 50px;
+  overflow: hidden; /* Ensures that the overflow is hidden */
+}
+
+.pfp-profile img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover; /* Ensures the image covers the entire container */
 }
 
 .username-profile {
@@ -178,4 +184,14 @@
   justify-content: start;
   gap: 10px;
   align-items: center;
+}
+
+@media screen and (max-width: 950px) {
+  .profile {
+    display: block;
+  }
+
+  .profile-div {
+    padding: 20px 0px;
+  }
 }

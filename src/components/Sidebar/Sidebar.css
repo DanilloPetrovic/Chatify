@@ -250,3 +250,41 @@
   border: 1px solid white;
   border-radius: 100%;
 }
+
+.nav-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #182c23;
+  gap: 10px;
+}
+
+.nav-bar button {
+  padding: 10px;
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.nav-bar button:hover {
+  background-color: #5b7668;
+}
+
+.suggested-weather {
+  display: none;
+}
+
+.pfp-responsive-sidebar {
+  width: 35px;
+  height: 35px;
+  border-radius: 100%;
+  border: 1px solid white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pfp-responsive-sidebar:hover {
+  transform: scale(0.95);
+}

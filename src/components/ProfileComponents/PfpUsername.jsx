@@ -50,11 +50,16 @@ const PfpUsername = () => {
     <div className="img-username">
       {userFirestore ? (
         <div>
-          {userFirestore.imageURL.length > 0 ? (
-            <img className="pfp-profile" src={userFirestore.imageURL} />
-          ) : (
-            <img className="pfp-profile" src={nopfp} />
-          )}
+          <div className="pfp-profile">
+            <img
+              src={
+                userFirestore.imageURL.length > 0
+                  ? userFirestore.imageURL
+                  : nopfp
+              }
+              alt="Profile"
+            />
+          </div>
           <p className="username-profile">{userFirestore.username}</p>
         </div>
       ) : null}

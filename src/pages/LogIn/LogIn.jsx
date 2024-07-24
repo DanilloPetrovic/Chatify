@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Navigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { auth, db } from "../../firebase";
@@ -8,7 +9,10 @@ import Loading from "../../components/Loading/Loading";
 
 const LogIn = () => {
   const [isLoading, setIsLoading] = useState(false);
+
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -47,6 +51,10 @@ const LogIn = () => {
 
   if (isLoading) {
     return <Loading />;
+  }
+
+  if (token) {
+    return <Navigate to="/" replace={true} />;
   }
 
   return (

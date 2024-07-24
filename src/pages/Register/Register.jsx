@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./Register.css";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -14,6 +14,7 @@ const Register = () => {
   const [usernames, setUsernames] = useState([]);
   const userCollection = collection(db, "users");
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   const getUsers = async () => {
     const data = await getDocs(userCollection);
@@ -48,7 +49,8 @@ const Register = () => {
       username: Yup.string()
         .required("required")
         .min(6, "min username length is 6")
-        .max(20, "max username length is 20"),
+        .max(10, "max username length is 10")
+        .lowercase("Username can't contain any uppercase letters"),
     }),
 
     onSubmit: async (values) => {
@@ -106,6 +108,10 @@ const Register = () => {
 
   if (isLoading) {
     return <Loading />;
+  }
+
+  if (token) {
+    return <Navigate to="/" replace={true} />;
   }
 
   return (

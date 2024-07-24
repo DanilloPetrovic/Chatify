@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./Group.css";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { auth, db } from "../../firebase";
 import {
   collection,

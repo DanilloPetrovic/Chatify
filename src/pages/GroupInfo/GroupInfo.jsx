@@ -149,8 +149,6 @@ const GroupInfo = () => {
     }
   };
 
-  console.log(currentChat);
-
   return (
     <div className="group-info">
       <div className="sidebar-div">

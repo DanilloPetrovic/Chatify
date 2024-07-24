@@ -419,3 +419,25 @@
   height: 100px;
   margin-top: 20px;
 }
+
+.responsive-sidebar-div {
+  display: none;
+}
+
+@media screen and (max-width: 950px) {
+  .sidebar-div {
+    display: none;
+  }
+
+  .Home {
+    display: block;
+  }
+
+  .main-div {
+    width: 100%;
+  }
+
+  .responsive-sidebar-div {
+    display: block;
+  }
+}

@@ -7,7 +7,7 @@ import FriendsGroups from "../../components/ProfileComponents/FriendsGropus";
 import ButtonsProfile from "../../components/ProfileComponents/ButtonsProfile";
 import ProfileInfo from "../../components/ProfileComponents/ProfileInfo";
 import MyStatuses from "../../components/ProfileComponents/MyStatuses";
-import { useParams } from "react-router-dom";
+import ResponsiveSidebar from "../../components/Sidebar/ResponsiveSidebar";
 
 const Profile = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +20,10 @@ const Profile = () => {
     <div className="profile">
       <div className="sidebar-div">
         <Sidebar />
+      </div>
+
+      <div className="responsive-sidebar-div">
+        <ResponsiveSidebar />
       </div>
 
       <div className="main-div profile-div">

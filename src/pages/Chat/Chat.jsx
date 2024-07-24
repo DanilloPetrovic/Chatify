@@ -10,7 +10,7 @@ import {
   updateDoc,
   doc,
 } from "firebase/firestore";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import { FaSmile } from "react-icons/fa";
 import nopfp from "../../photos/nopfp.png";
